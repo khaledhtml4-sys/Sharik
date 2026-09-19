@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مرحباً بك في شارك | التكئية الأولى</title>
+  <meta name="robots" content="noindex, follow"><meta name="description" content="قم بتهيئة حسابك واختيار مهاراتك لبدء تجربة تبادل المهارات." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/saas/saas.css" />
+<link rel="stylesheet" href="/tria-theme.css">
+  <script src="/config.js"></script>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--saas-grad);
+      color: var(--saas-text);
+      font-family: var(--saas-font);
+      padding: 24px 16px;
+    }
+    .onboarding-card {
+      background: var(--saas-surface);
+      border: 1px solid var(--saas-border);
+      border-radius: 24px;
+      padding: 36px 28px;
+      max-width: 580px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      backdrop-filter: blur(12px);
+      position: relative;
+    }
+    .step-progress {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .step-bar {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(203,166,247,0.2);
+      transition: background 0.3s;
+    }
+    .step-bar.active { background: #b57bee; }
+    .step-bar.completed { background: #10b981; }
+
+    .step-title { font-size: 22px; font-weight: 800; margin: 0 0 8px; }
+    .step-subtitle { color: var(--saas-muted); font-size: 14px; margin: 0 0 24px; }
+
+    .tag-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .tag-chip {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--saas-border);
+      background: rgba(181,123,238,0.06);
+      color: var(--saas-text);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .tag-chip.selected {
+      background: #b57bee;
+      border-color: #b57bee;
+      color: white;
+    }
+
+    .form-group { margin-bottom: 18px; }
+    .form-label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--saas-muted); }
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--saas-border);
+      background: var(--saas-surface-solid);
+      color: var(--saas-text);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .form-input:focus { border-color: #b57bee; box-shadow: var(--saas-glow); }
+
+    .actions { display: flex; justify-content: space-between; margin-top: 28px; gap: 12px; }
+  </style>
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+<body class="dark saas-app">
+  <div class="onboarding-card">
+    <div class="step-progress">
+      <div class="step-bar active" id="bar1"></div>
+      <div class="step-bar" id="bar2"></div>
+      <div class="step-bar" id="bar3"></div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div id="step1">
+      <h1 class="step-title">👋 مرحباً بك في منصة شارك!</h1>
+      <p class="step-subtitle">اختر المهارات التي تتقنها وترغب في تعليمها للمجتمع:</p>
+      
+      <div class="form-group">
+        <label class="form-label">🎓 المهارات التي تُقنها (يمكنك اختيار أكثر من مهارة):</label>
+        <div class="tag-chips" id="teachChips">
+          <div class="tag-chip" onclick="toggleTag(this, 'teach', 'JavaScript')">JavaScript</div>
+          <div class="tag-chip" onclick="toggleTag(this, 'teach', 'React')">React.js</div>
+          <div class="tag-chip" onclick="toggleTag(this, 'teach', 'Python')">Python</div>
+          <div class="tag-chip" onclick="toggleTag(this, 'teach', 'UI/UX Design')">UI/UX Design</div>
+          <div class="tag-chip" onclick="toggleTag(this, 'teach', 'Node.js')">Node.js</div>
+          <div class="tag-chip" onclick="toggleTag(this, 'teach', 'HTML/CSS')">Cybersecurity</div>
+          <div class="tag-chip" onclick="toggleTag(this, 'teach', 'اللغة الإنجليزية')">English</div>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:24px">
+        <label class="form-label">💡 المهارات التي ترغب في تعلمها:</label>
+        <div class="tag-chips" id="learnChips">
+          <div class="tag-chip" onclick="toggleTag(this, 'learn', 'React')">AI & Machine Learning</div>
+          <div class="tag-chip" onclick="toggleTag(this, 'learn', 'اللغة الإنجليزية')">Docker & DevOps</div>
+          <div class="tag-chip" onclick="toggleTag(this, 'learn', 'Python')">TypeScript</div>
+          <div class="tag-chip" onclick="toggleTag(this, 'learn', 'التسويق الرقمي')">Data Science</div>
+          <div class="tag-chip" onclick="toggleTag(this, 'learn', 'كتابة المحتوى')">Mobile Apps</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <div></div>
+        <button class="saas-btn saas-btn-primary" onclick="nextStep(2)">المتابعة 🚀</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="step2" style="display:none">
+      <h1 class="step-title">👤 أكمل ملفك الشخصي</h1>
+      <p class="step-subtitle">نبذة صغيرة عنك تُساعد الشركاء في التعرف عليك:</p>
+
+      <div class="form-group">
+        <label class="form-label">النبذة الشخصية (Bio):</label>
+        <textarea class="form-input" id="obBio" rows="3" placeholder="أخبرنا باهتماماتك التقنية والمهارات التي تسعى لتطويرها..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">الدولة / المنطقة:</label>
+        <select class="form-input" id="obCountry">
+          <option value="مصر">مصر</option>
+          <option value="السعودية">السعودية</option>
+          <option value="الإمارات">الإمارات</option>
+          <option value="الأردن">الأردن</option>
+          <option value="المغرب">المغرب</option>
+          <option value="أخرى">أخرى</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button class="saas-btn saas-btn-ghost" onclick="nextStep(1)">السابق</button>
+        <button class="saas-btn saas-btn-primary" onclick="nextStep(3)">المتابعة 🚀</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="step3" style="display:none">
+      <h1 class="step-title">🎯 ما هو هدفك رئيسي؟</h1>
+      <p class="step-subtitle">سنحدد لك الخطة الأنسب بناءً على هذا التخصص:</p>
+
+      <div class="form-group">
+        <label class="form-label">التخصص المستهدف:</label>
+        <select class="form-input" id="obGoal">
+          <option value="أريد أن أصبح مهندس ذكاء اصطناعي">🤖 مهندس ذكاء اصطناعي (AI Engineer)</option>
+          <option value="أريد أن أصبح مطور Frontend">💻 مطور واجهات أمامية (Frontend Developer)</option>
+          <option value="أريد أن أصبح مطور Backend">⚙️ مطور واجهات خلفية (Backend Developer)</option>
+          <option value="أريد تعلم تصميم UI/UX">🎨 مصمم واجهات (UI/UX Designer)</option>
+          <option value="أريد أن أصبح أخصائي أمن معلومات">🛡️ أمن معلومات (Cybersecurity)</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button class="saas-btn saas-btn-ghost" onclick="nextStep(2)">السابق</button>
+        <button class="saas-btn saas-btn-primary" id="finishBtn" onclick="finishOnboarding()">إنهاء وبدء الرحلة 🎉</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const selectedTeach = new Set([]);
+      const selectedLearn = new Set([]);
+
+      window.toggleTag = function(el, type, val) {
+        const set = type === 'teach' ? selectedTeach : selectedLearn;
+        if (set.has(val)) {
+          set.delete(val);
+          el.classList.remove('selected');
+        } else {
+          set.add(val);
+          el.classList.add('selected');
+        }
+      };
+
+      window.nextStep = function(step) {
+        document.getElementById('step1').style.display = step === 1 ? 'block' : 'none';
+        document.getElementById('step2').style.display = step === 2 ? 'block' : 'none';
+        document.getElementById('step3').style.display = step === 3 ? 'block' : 'none';
+
+        document.getElementById('bar1').className = 'step-bar ' + (step >= 1 ? (step > 1 ? 'completed' : 'active') : '');
+        document.getElementById('bar2').className = 'step-bar ' + (step >= 2 ? (step > 2 ? 'completed' : 'active') : '');
+        document.getElementById('bar3').className = 'step-bar ' + (step >= 3 ? 'active' : '');
+      };
+
+      window.finishOnboarding = async function() {
+        const btn = document.getElementById('finishBtn');
+        if (selectedTeach.size === 0 || selectedLearn.size === 0) {
+          alert('⚠️ لازم تختار مهارة واحدة على الأقل من كل قسم (مهارة تريد تعلمها ومهارة تستطيع تعليمها)');
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = '⏳ جاري الحفظ...';
+
+        const bio = document.getElementById('obBio').value.trim();
+        const country = document.getElementById('obCountry').value;
+        const goal = document.getElementById('obGoal').value;
+
+        localStorage.setItem('lastRoadmapGoal', goal);
+
+        try {
+          const tok = localStorage.getItem('token');
+          const base = (window.SHARIK_CONFIG && window.SHARIK_CONFIG.API_BASE) || '';
+          const res = await fetch(base + '/api/me/profile', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + tok
+            },
+            body: JSON.stringify({
+              bio: bio || 'عضو شغوف لتبادل المهارات في منصة شارك.',
+              country: country,
+              teachSkills: Array.from(selectedTeach),
+              learnSkills: Array.from(selectedLearn),
+              onboarded: true
+            })
+          });
+
+          if (!res.ok) {
+            let msg = 'تعذر حفظ الملف، حاول مرة أخرى';
+            try { msg = (await res.json()).error || msg; } catch (e) {}
+            btn.disabled = false;
+            btn.textContent = 'إنهاء وبدء الرحلة 🎉';
+            alert('❌ ' + msg);
+            return;
+          }
+          try {
+            const data = await res.json();
+            if (data && data.user) localStorage.setItem('currentUser', JSON.stringify(data.user));
+          } catch (e) {}
+          window.location.href = '/app/dashboard.html';
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = 'إنهاء وبدء الرحلة 🎉';
+          alert('❌ حدث خطأ في الاتصال بالسيرفر');
+        }
+      };})();
+  </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.log
+.DS_Store
+.firebase/
+dist/
+coverage/
+
+.qa-work/
+i18n-work/
+node-js كامل/npm-debug.log*

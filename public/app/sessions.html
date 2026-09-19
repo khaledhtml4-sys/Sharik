@@ -1,0 +1,242 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>حجز الجلسات | شارك</title>
+  <meta name="description" content="جدول جلسات تبادل المهارات مع فتحات زمنية، مناطق زمنية، وتكامل تقويم Google." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://sharij-532a3.web.app/app/sessions.html" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/saas/saas.css" />
+<link rel="stylesheet" href="/tria-theme.css">
+  <script src="/config.js"></script>
+  <style>
+    .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+    .cal-day, .cal-cell { text-align: center; padding: 10px 4px; border-radius: 12px; font-size: .85rem; }
+    .cal-day { color: var(--saas-muted); }
+    .cal-cell { border: 1px solid var(--saas-border); background: rgba(181,123,238,.04); cursor: pointer; }
+    .cal-cell.active { background: linear-gradient(135deg, var(--saas-primary), var(--saas-accent)); color: #fff; border-color: transparent; }
+    .cal-cell.muted { opacity: .35; pointer-events: none; }
+    .slots { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .slot { padding: 8px 12px; border-radius: 999px; border: 1px solid var(--saas-border); cursor: pointer; background: var(--saas-surface); }
+    .slot.active { border-color: transparent; background: rgba(211,164,239,.2); color: var(--saas-accent); }
+    .form-row { display: grid; gap: 8px; margin-bottom: 12px; }
+    .form-row input, .form-row select, .form-row textarea { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--saas-border); background: var(--saas-surface); color: var(--saas-text); font: inherit; }
+  </style>
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+<body class="dark saas-app">
+  <div id="saas-root"></div>
+  <script src="/saas/saas-shell.js"></script>
+  <script>
+    (async function () {
+      const S = window.SharikSaaS;
+      if (!S.requireAuth()) return;
+      const content = S.mountShell("sessions");
+      if (!content) return;
+
+      const params = new URLSearchParams(location.search);
+      const partnerPref = params.get("partner") || "";
+      const skillPref = params.get("skill") || "";
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "Africa/Cairo";
+      let selectedDate = null;
+      let selectedSlot = null;
+      const now = new Date();
+
+      content.innerHTML = `
+        <div class="saas-page-head">
+          <div>
+            <h1>جدولة الجلسات</h1>
+            <p>اختر يوماً ووقتاً مناسباً — المنطقة الزمنية: <strong>${S.escapeHtml(tz)}</strong></p>
+          </div>
+          <a class="saas-btn saas-btn-ghost" href="/login-signup/matching-results.html">اختيار شريك</a>
+        </div>
+        <div class="saas-grid saas-grid-2">
+          <div class="saas-card">
+            <h2>التقويم</h2>
+            <div id="calLabel" style="color:var(--saas-muted);margin-bottom:10px"></div>
+            <div class="cal-grid" id="calHead"></div>
+            <div class="cal-grid" id="calBody" style="margin-top:6px"></div>
+            <h3 style="margin-top:18px">الأوقات المتاحة</h3>
+            <div class="slots" id="slots"></div>
+          </div>
+          <div class="saas-card">
+            <h2>تفاصيل الحجز</h2>
+            <div class="form-row">
+              <label>بريد الشريك</label>
+              <input id="partnerEmail" value="${S.escapeHtml(partnerPref)}" placeholder="partner@email.com" />
+            </div>
+            <div class="form-row">
+              <label>المهارة</label>
+              <input id="skill" value="${S.escapeHtml(skillPref)}" placeholder="JavaScript" />
+            </div>
+            <div class="form-row">
+              <label>المدة</label>
+              <select id="duration">
+                <option value="45">45 دقيقة</option>
+                <option value="60" selected>60 دقيقة</option>
+                <option value="75">75 دقيقة</option>
+                <option value="90">90 دقيقة</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>ملاحظات</label>
+              <textarea id="notes" rows="3" placeholder="موضوع الجلسة أو رابط تحضيري"></textarea>
+            </div>
+            <button class="saas-btn saas-btn-primary" id="bookBtn" style="width:100%">تأكيد الحجز</button>
+            <p id="bookMsg" style="color:var(--saas-muted);margin-top:12px;font-size:.9rem"></p>
+          </div>
+        </div>
+        <div class="saas-grid saas-grid-2" style="margin-top:16px">
+          <div class="saas-card">
+            <h2>القادمة</h2>
+            <div id="upcoming"></div>
+          </div>
+          <div class="saas-card">
+            <h2>السابقة</h2>
+            <div id="past"></div>
+          </div>
+        </div>
+      `;
+
+      function renderCalendar() {
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        document.getElementById("calLabel").textContent = now.toLocaleDateString("ar-EG", { month: "long", year: "numeric" });
+        document.getElementById("calHead").innerHTML = ["أحد","إثنين","ثلاثاء","أربعاء","خميس","جمعة","سبت"]
+          .map((d) => `<div class="cal-day">${d}</div>`).join("");
+
+        const first = new Date(year, month, 1);
+        const startPad = first.getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        let html = "";
+        for (let i = 0; i < startPad; i++) html += `<div class="cal-cell muted"></div>`;
+        for (let d = 1; d <= daysInMonth; d++) {
+          const date = new Date(year, month, d);
+          const iso = date.toISOString().slice(0, 10);
+          const disabled = date < new Date(new Date().toDateString());
+          html += `<button type="button" class="cal-cell ${disabled ? "muted" : ""} ${selectedDate === iso ? "active" : ""}" data-date="${iso}">${d}</button>`;
+        }
+        document.getElementById("calBody").innerHTML = html;
+
+        document.querySelectorAll(".cal-cell[data-date]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            selectedDate = btn.getAttribute("data-date");
+            selectedSlot = null;
+            renderCalendar();
+            renderSlots();
+          });
+        });
+      }
+
+      function renderSlots() {
+        const slots = ["10:00", "12:00", "14:00", "16:00", "18:00", "20:00"];
+        document.getElementById("slots").innerHTML = selectedDate ? slots
+          .map(
+            (s) => `<button type="button" class="slot ${selectedSlot === s ? "active" : ""}" data-slot="${s}">${s}</button>`
+          )
+          .join("") : '<span style="color:var(--saas-muted)">اختر يوماً أولاً</span>';
+
+        document.querySelectorAll(".slot").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            selectedSlot = btn.getAttribute("data-slot");
+            renderSlots();
+          });
+        });
+      }
+
+      function renderSessionList(el, sessions, past) {
+        if (!sessions.length) {
+          el.innerHTML = `<div class="empty-state"><p>${past ? "لا جلسات سابقة" : "لا جلسات قادمة"}</p></div>`;
+          return;
+        }
+        el.innerHTML = sessions
+          .map(
+            (sess) => `
+              <div style="padding:12px 0;border-bottom:1px solid var(--saas-border)">
+                <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">
+                  <div>
+                    <strong>${S.escapeHtml(sess.skill)}</strong>
+                    <div style="color:var(--saas-muted);font-size:.85rem">${new Date(sess.startAt).toLocaleString("ar-EG")}</div>
+                    <div style="color:var(--saas-muted);font-size:.8rem">${S.escapeHtml(sess.hostEmail)} ↔ ${S.escapeHtml(sess.guestEmail)}</div>
+                  </div>
+                  <span class="saas-chip">${S.escapeHtml(sess.status)}</span>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                  ${ !past && sess.status !== "cancelled" ? `<button class="saas-btn saas-btn-soft act" data-id="${sess._id}" data-act="confirmed">تأكيد</button><button class="saas-btn saas-btn-ghost act" data-id="${sess._id}" data-act="cancelled">إلغاء</button><button class="saas-btn saas-btn-ghost act" data-id="${sess._id}" data-act="completed">إكمال</button>` : "" }
+                  ${ sess.googleEventUrl ? `<a class="saas-btn saas-btn-primary" target="_blank" rel="noopener" href="${S.escapeHtml(sess.googleEventUrl)}">Google Calendar</a>` : "" }
+                </div>
+              </div>`
+          )
+          .join("");
+
+        el.querySelectorAll(".act").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            try {
+              await S.api("/api/sessions/" + btn.getAttribute("data-id"), {
+                method: "PATCH",
+                body: JSON.stringify({ status: btn.getAttribute("data-act") }),
+              });
+              loadSessions();
+            } catch (e) {
+              alert(e.message);
+            }
+          });
+        });
+      }
+
+      async function loadSessions() {
+        try {
+          const data = await S.api("/api/sessions");
+          const all = data.sessions || [];
+          const upcoming = all.filter((s) => ["pending", "confirmed", "rescheduled"].includes(s.status) && new Date(s.startAt) >= new Date());
+          const past = all.filter((s) => s.status === "completed" || s.status === "cancelled" || new Date(s.startAt) < new Date());
+
+          renderSessionList(document.getElementById("upcoming"), upcoming, false);
+          renderSessionList(document.getElementById("past"), past, true);
+        } catch {
+          renderSessionList(document.getElementById("upcoming"), [], false);
+          renderSessionList(document.getElementById("past"), [], true);
+        }
+      }
+
+      document.getElementById("bookBtn").addEventListener("click", async () => {
+        const msg = document.getElementById("bookMsg");
+        const partnerEmail = document.getElementById("partnerEmail").value.trim();
+        const skill = document.getElementById("skill").value.trim();
+
+        if (!partnerEmail || !skill || !selectedDate || !selectedSlot) {
+          msg.textContent = "أكمل الشريك والمهارة والتاريخ والوقت";
+          return;
+        }
+
+        const startAt = new Date(`${selectedDate}T${selectedSlot}:00`);
+
+        try {
+          const res = await S.api("/api/sessions", {
+            method: "POST",
+            body: JSON.stringify({
+              partnerEmail,
+              skill,
+              startAt: startAt.toISOString(),
+              durationMinutes: Number(document.getElementById("duration").value),
+              timezone: tz,
+              notes: document.getElementById("notes").value,
+            }),
+          });
+          msg.innerHTML = `تم إنشاء الطلب ✓ ${ res.googleCalendarUrl ? `<a href="${res.googleCalendarUrl}" target="_blank" rel="noopener">أضف لتقويم Google</a>` : "" }`;
+          loadSessions();
+        } catch (e) {
+          msg.textContent = e.message;
+        }
+      });
+
+      renderCalendar();
+      renderSlots();
+      loadSessions();
+    })();
+  </script>
+</body>
+</html>

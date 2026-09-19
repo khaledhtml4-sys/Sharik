@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>التحقق من الشهادة | شارك</title>
+  <link rel="canonical" href="https://sharij-532a3.web.app/app/certificate-verify.html"><meta name="description" content="تحقق من صحة شهادات شارك المعتمدة باستخدام رقم الشهادة الفريد." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/saas/saas.css" />
+<link rel="stylesheet" href="/tria-theme.css">
+  <script src="/config.js"></script>
+  <style>
+    .verify-box {
+      background: var(--saas-surface);
+      border: 1px solid var(--saas-border);
+      backdrop-filter: blur(16px);
+      border-radius: var(--saas-radius);
+      padding: 36px;
+      max-width: 540px;
+      margin: 20px auto;
+      text-align: center;
+      box-shadow: var(--saas-shadow);
+    }
+    .verify-input-wrap {
+      display: flex;
+      gap: 10px;
+      margin: 24px 0;
+      flex-wrap: wrap;
+    }
+    .verify-input {
+      flex: 1;
+      min-width: 220px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--saas-border);
+      background: var(--saas-bg-2);
+      color: var(--saas-text);
+      font-family: inherit;
+      font-size: 15px;
+      text-align: center;
+      outline: none;
+    }
+    .verify-input:focus { border-color: var(--saas-primary); }
+    .cert-result {
+      border: 2px solid var(--saas-success);
+      background: rgba(16,185,129,0.08);
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 20px;
+      text-align: right;
+      animation: fadeIn 0.3s ease;
+    }
+    .cert-badge-icon { font-size: 48px; text-align: center; margin-bottom: 12px; }
+    .cert-row { margin-bottom: 10px; font-size: 14px; }
+    .cert-label { color: var(--saas-muted); font-size: 12px; margin-bottom: 2px; }
+    .cert-val { font-weight: 700; color: var(--saas-text); }
+    @keyframes fadeIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:none} }
+  </style>
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+<body class="dark saas-app">
+  <div id="saas-root"></div>
+  <script src="/saas/saas-shell.js"></script>
+  <script>
+    (async function () {
+      const S = window.SharikSaaS;
+      const content = S.mountShell("certificate-verify");
+      if (!content) return;
+
+      function esc(str) { return S.escapeHtml(str); }
+
+      content.innerHTML = `
+        <div class="saas-page-head" style="justify-content:center;text-align:center">
+          <div>
+            <h1>🔍 التحقق من صحة الشهادات</h1>
+            <p>أدخل معرف الشهادة المكون من الأحرف والأرقام للتحقق من مصداقيتها وصحتها في السجلات</p>
+          </div>
+        </div>
+        <div class="verify-box">
+          <div style="font-size:48px;margin-bottom:12px">🎖️</div>
+          <h2 style="font-size:20px;font-weight:800;margin-bottom:6px">شهادات شارك المعتمدة</h2>
+          <p style="color:var(--saas-muted);font-size:13px">نظام التوثيق الرقمي المعتمد لتبادل المهارات</p>
+          <div class="verify-input-wrap">
+            <input class="verify-input" id="certIdInput" placeholder="مثال: SHARIK-CERT-2026-X9Y2" autocomplete="off" />
+            <button class="saas-btn saas-btn-primary" onclick="window.verifyCert()">تحقق الآن</button>
+          </div>
+          <div id="resultBox"></div>
+        </div>
+      `;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const certIdParam = urlParams.get('id');
+      if (certIdParam) {
+        document.getElementById('certIdInput').value = certIdParam;
+        window.verifyCert();
+      }
+
+      window.verifyCert = async function() {
+        const id = document.getElementById('certIdInput').value.trim();
+        if (!id) return S.toast('يرجى إدخال معرف الشهادة', 'warning');
+        const box = document.getElementById('resultBox');
+        box.innerHTML = '<div style="color:var(--saas-muted);padding:20px">⏳ جاري التحقق من السجلات...</div>';
+        try {
+          const res = await S.api(`/api/certificates/verify/${encodeURIComponent(id)}`);
+          if (res && res.valid) {
+            const c = res.certificate || {};
+            box.innerHTML = `
+              <div class="cert-result">
+                <div class="cert-badge-icon">✅</div>
+                <div style="text-align:center;font-weight:800;font-size:18px;color:var(--saas-success);margin-bottom:16px">شهادة معتمدة وصالحة</div>
+                <div class="cert-row"><div class="cert-label">صاحب الشهادة</div><div class="cert-val">${esc(c.holderName)}</div></div>
+                <div class="cert-row"><div class="cert-label">عنوان الشهادة</div><div class="cert-val">${esc(c.title)}</div></div>
+                <div class="cert-row"><div class="cert-label">الجهة المصدرة</div><div class="cert-val">${esc(c.issuer)}</div></div>
+                <div class="cert-row"><div class="cert-label">تاريخ الإصدار</div><div class="cert-val">${esc(c.year || '2026')}</div></div>
+                <div class="cert-row"><div class="cert-label">معرف الشهادة</div><div class="cert-val" style="font-family:monospace;font-size:13px;color:var(--saas-primary)">${esc(c.certId || id)}</div></div>
+              </div>
+            `;
+          } else {
+            box.innerHTML = `
+              <div style="border:2px solid var(--saas-danger);background:rgba(239,68,68,0.08);border-radius:16px;padding:20px;margin-top:20px;color:var(--saas-danger)">
+                ❌ ${esc(res.error || 'الشهادة غير صحيحة أو غير مسجلة لدينا')}
+              </div>
+            `;
+          }
+        } catch (err) {
+          box.innerHTML = '<div style="color:var(--saas-danger);padding:20px">حدث خطأ في الاتصال بالخادم.</div>';
+        }
+      };
+    })();
+  </script>
+
+  <script>
+    /* زر مشاركة الشهادة على LinkedIn — يظهر بعد نجاح التحقق */
+    (function () {
+      document.addEventListener("DOMContentLoaded", function () {
+        var box = document.getElementById("resultBox") || document.querySelector(".saas-card");
+        if (!box) return;
+        var li = document.createElement("a");
+        li.id = "liShare";
+        li.target = "_blank";
+        li.rel = "noopener noreferrer";
+        li.className = "saas-btn saas-btn-primary";
+        li.style.cssText = "display:none;margin:18px auto 0;border-radius:999px";
+        li.innerHTML = "in أضف الشهادة إلى LinkedIn";
+        box.appendChild(li);
+        var lastOk = null;
+        new MutationObserver(function () {
+          var okBadge = box.innerHTML.indexOf("✅") !== -1 || box.innerHTML.indexOf("صحيحة") !== -1;
+          if (okBadge && !lastOk) {
+            var url = window.location.href;
+            li.href = "https://www.linkedin.com/sharing/share-offsite/?url=" + encodeURIComponent(url);
+            li.style.display = "inline-flex";
+          }
+          lastOk = okBadge;
+        }).observe(box, { childList: true, subtree: true, characterData: true });
+      });
+    })();
+  </script>
+</body>
+</html>

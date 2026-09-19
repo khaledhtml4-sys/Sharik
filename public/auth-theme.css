@@ -1,0 +1,349 @@
+/* ═══════════════════════════════════════════════════════════════
+   SHARIK — AUTH PAGES THEME (تسجيل الدخول / إنشاء حساب)
+   هوية موحدة: بنفسجي داكن + لافندر/وردي — يُحمَّل آخراً
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── الإطار العام ─────────────────────────────────────────────── */
+body:has(.split-auth-wrap),
+body:has(.auth-card) {
+  background:
+    radial-gradient(1100px 640px at 85% -8%, rgba(122, 62, 210, 0.3), transparent 60%),
+    radial-gradient(900px 560px at 6% 30%, rgba(181, 123, 238, 0.14), transparent 60%),
+    radial-gradient(800px 600px at 50% 110%, rgba(150, 70, 190, 0.12), transparent 60%),
+    #0d0916 !important;
+  min-height: 100vh;
+}
+body.light:has(.split-auth-wrap),
+body.light:has(.auth-card) {
+  background:
+    radial-gradient(1100px 640px at 85% -8%, rgba(139, 79, 214, 0.1), transparent 60%),
+    radial-gradient(900px 560px at 6% 30%, rgba(181, 123, 238, 0.08), transparent 60%),
+    #faf7ff !important;
+}
+
+.split-auth-wrap {
+  display: grid !important;
+  grid-template-columns: minmax(0, 520px) minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
+  min-height: calc(100vh - 72px);
+  max-width: 1280px;
+  margin: 0 auto !important;
+  padding: 48px 4% 64px !important;
+  background: transparent !important;
+}
+
+/* ─── كارت النموذج (زجاجي بنفسجي) ─────────────────────────────── */
+.auth-form-side { display: flex; justify-content: center; }
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  background: linear-gradient(165deg, rgba(33, 24, 51, 0.92), rgba(23, 16, 38, 0.88)) !important;
+  border: 1px solid rgba(203, 166, 247, 0.18) !important;
+  border-radius: 26px !important;
+  padding: 40px 36px !important;
+  box-shadow:
+    0 30px 80px rgba(5, 2, 12, 0.55),
+    0 0 0 1px rgba(181, 123, 238, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  position: relative;
+  overflow: hidden;
+}
+.auth-card::before {
+  content: "";
+  position: absolute;
+  top: -70px;
+  inset-inline-end: -70px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(181, 123, 238, 0.22), transparent 70%);
+  pointer-events: none;
+}
+body.light .auth-card {
+  background: #ffffff !important;
+  border-color: rgba(122, 60, 193, 0.16) !important;
+  box-shadow: 0 24px 60px rgba(90, 40, 150, 0.14) !important;
+}
+
+/* ─── الحقول ───────────────────────────────────────────────────── */
+.auth-input-group { margin-bottom: 20px !important; }
+.auth-label {
+  color: var(--t-muted, #a89bc2) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  margin-bottom: 8px !important;
+  font-family: "Cairo", "Tajawal", sans-serif;
+}
+.auth-input {
+  background: rgba(13, 9, 22, 0.55) !important;
+  border: 1.5px solid rgba(203, 166, 247, 0.16) !important;
+  border-radius: 14px !important;
+  padding: 13px 16px !important;
+  color: var(--t-text, #f5f1fb) !important;
+  font-size: 15px !important;
+  height: auto !important;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.auth-input::placeholder { color: rgba(168, 155, 194, 0.5) !important; }
+.auth-input:hover { border-color: rgba(203, 166, 247, 0.3) !important; }
+.auth-input:focus {
+  border-color: var(--t-lav, #b57bee) !important;
+  box-shadow: 0 0 0 4px rgba(181, 123, 238, 0.16) !important;
+  background: rgba(13, 9, 22, 0.8) !important;
+  outline: none !important;
+}
+body.light .auth-input {
+  background: #f7f1ff !important;
+  border-color: rgba(122, 60, 193, 0.18) !important;
+  color: #241635 !important;
+}
+body.light .auth-input:focus {
+  background: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(139, 79, 214, 0.12) !important;
+}
+
+/* رابط "نسيت كلمة المرور" وأي روابط داخل الكارت */
+.auth-card a { color: var(--t-lav, #c9a2f0) !important; }
+.auth-card a:hover { text-decoration: underline !important; }
+
+/* ─── زر الإرسال (تدرج الهوية) ─────────────────────────────────── */
+.auth-submit-btn {
+  width: 100% !important;
+  padding: 15px !important;
+  border-radius: 999px !important;
+  border: none !important;
+  background: linear-gradient(120deg, #b57bee 0%, #d3a4ef 55%, #eec3e5 100%) !important;
+  color: #241635 !important;
+  font-weight: 900 !important;
+  font-size: 16px !important;
+  font-family: "Cairo", "Tajawal", sans-serif !important;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  box-shadow: 0 12px 34px rgba(181, 123, 238, 0.4) !important;
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s !important;
+}
+.auth-submit-btn:hover {
+  transform: translateY(-2px) !important;
+  filter: brightness(1.05);
+  box-shadow: 0 18px 44px rgba(181, 123, 238, 0.5) !important;
+}
+.auth-submit-btn:active { transform: translateY(0) !important; }
+.auth-submit-btn:disabled { opacity: 0.7; cursor: wait; }
+body.light .auth-submit-btn { color: #ffffff !important; }
+
+/* ─── بانر انتهاء الجلسة ───────────────────────────────────────── */
+.expired-banner[style*="flex"] {
+  background: rgba(245, 158, 11, 0.1) !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+  margin-bottom: 20px !important;
+  color: #fbbf24 !important;
+  font-size: 13.5px !important;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ─── الجانب التسويقي ──────────────────────────────────────────── */
+.auth-hero-side {
+  background: transparent !important;
+  border-inline-start: none !important;
+  padding: 24px !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+}
+.auth-hero-side::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(420px 300px at 75% 20%, rgba(122, 62, 210, 0.28), transparent 65%),
+    radial-gradient(380px 280px at 15% 85%, rgba(181, 123, 238, 0.16), transparent 60%) !important;
+}
+.auth-hero-side > div { z-index: 2; position: relative; }
+
+/* عنوان الجانب التسويقي */
+.auth-hero-side h1 {
+  font-family: "Cairo", "Tajawal", sans-serif !important;
+  font-size: clamp(30px, 3.4vw, 44px) !important;
+  font-weight: 900 !important;
+  line-height: 1.35 !important;
+  margin-bottom: 18px !important;
+  color: var(--t-text, #f5f1fb) !important;
+}
+.auth-hero-side p {
+  color: var(--t-muted, #a89bc2) !important;
+  font-size: 16.5px !important;
+  line-height: 1.9 !important;
+  margin-bottom: 34px !important;
+}
+
+/* البادج العلوي */
+.auth-hero-side > div > div:first-child {
+  background: linear-gradient(135deg, rgba(181, 123, 238, 0.16), rgba(238, 195, 229, 0.08)) !important;
+  border: 1px solid rgba(203, 166, 247, 0.28) !important;
+  color: var(--t-lav, #c9a2f0) !important;
+  font-family: "Cairo", "Tajawal", sans-serif;
+  backdrop-filter: blur(8px);
+}
+
+/* كروت الميزات الصغيرة */
+.auth-hero-side div[style*="1fr 1fr"] > div {
+  background: rgba(203, 166, 247, 0.06) !important;
+  border: 1px solid rgba(203, 166, 247, 0.14) !important;
+  border-radius: 18px !important;
+  padding: 20px !important;
+  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+.auth-hero-side div[style*="1fr 1fr"] > div:hover {
+  transform: translateY(-4px);
+  border-color: rgba(203, 166, 247, 0.32) !important;
+  background: rgba(203, 166, 247, 0.1) !important;
+}
+.auth-hero-side div[style*="1fr 1fr"] strong {
+  color: var(--t-text, #f5f1fb) !important;
+  font-family: "Cairo", "Tajawal", sans-serif;
+}
+.auth-hero-side div[style*="1fr 1fr"] span {
+  color: var(--t-muted, #a89bc2) !important;
+}
+
+/* ─── نافذة "نسيت كلمة المرور" ─────────────────────────────────── */
+.schedule-modal > div {
+  background: linear-gradient(165deg, #211833, #171026) !important;
+  border: 1px solid rgba(203, 166, 247, 0.2) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 30px 80px rgba(5, 2, 12, 0.6) !important;
+}
+.schedule-modal h3 { color: var(--t-text, #f5f1fb) !important; }
+.schedule-modal input {
+  background: rgba(13, 9, 22, 0.55) !important;
+  border: 1.5px solid rgba(203, 166, 247, 0.16) !important;
+  border-radius: 12px !important;
+  color: var(--t-text, #f5f1fb) !important;
+  padding: 11px 14px !important;
+  width: 100%;
+}
+.schedule-modal input:focus {
+  border-color: var(--t-lav, #b57bee) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(181, 123, 238, 0.16) !important;
+}
+.schedule-modal button {
+  border-radius: 999px !important;
+  font-weight: 800 !important;
+  font-family: "Cairo", "Tajawal", sans-serif;
+}
+
+/* ─── عناوين الكارت ────────────────────────────────────────────── */
+.auth-card h2 {
+  font-family: "Cairo", "Tajawal", sans-serif !important;
+  color: var(--t-text, #f5f1fb) !important;
+  font-size: 26px !important;
+  letter-spacing: -0.01em;
+}
+.auth-card > div > p { color: var(--t-muted, #a89bc2) !important; }
+
+/* ─── responsive ───────────────────────────────────────────────── */
+@media (max-width: 991px) {
+  .split-auth-wrap {
+    grid-template-columns: 1fr !important;
+    padding-top: 24px !important;
+  }
+  .auth-hero-side { order: -1; padding: 8px 4px 0 !important; }
+  .auth-hero-side h1 { font-size: 26px !important; }
+  .auth-hero-side p { font-size: 14.5px !important; margin-bottom: 22px !important; }
+  .auth-hero-side::before { opacity: 0.55; }
+}
+@media (max-width: 520px) {
+  .auth-card { padding: 28px 20px !important; }
+  .auth-hero-side div[style*="1fr 1fr"] { grid-template-columns: 1fr !important; }
+}
+
+/* ─── عناصر إدخال متناسقة ─────────────────────────────────────── */
+body:has(.auth-card) input[type="checkbox"] {
+  accent-color: #b57bee;
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+}
+body:has(.auth-card) ::selection {
+  background: rgba(181, 123, 238, 0.35);
+}
+body:has(.auth-card) input:-webkit-autofill,
+body:has(.auth-card) input:-webkit-autofill:hover,
+body:has(.auth-card) input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #150d24 inset;
+  -webkit-text-fill-color: #f5f1fb;
+  caret-color: #f5f1fb;
+  transition: background-color 9999s ease-in-out 0s;
+}
+body.light:has(.auth-card) input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #f7f1ff inset;
+  -webkit-text-fill-color: #241635;
+}
+
+/* ─── صفحة إعادة تعيين كلمة المرور ────────────────────────────── */
+body:has(#resetForm) {
+  background:
+    radial-gradient(1100px 640px at 85% -8%, rgba(122, 62, 210, 0.3), transparent 60%),
+    radial-gradient(900px 560px at 6% 30%, rgba(181, 123, 238, 0.14), transparent 60%),
+    #0d0916 !important;
+}
+body:has(#resetForm) main {
+  background: linear-gradient(165deg, rgba(33, 24, 51, 0.92), rgba(23, 16, 38, 0.88)) !important;
+  border: 1px solid rgba(203, 166, 247, 0.18) !important;
+  border-radius: 26px !important;
+  margin-top: 110px !important;
+  padding: 40px 36px !important;
+  box-shadow: 0 30px 80px rgba(5, 2, 12, 0.55) !important;
+}
+body:has(#resetForm) h1 {
+  font-family: "Cairo", "Tajawal", sans-serif !important;
+  color: var(--t-text, #f5f1fb) !important;
+  font-size: 24px !important;
+}
+body:has(#resetForm) p { color: var(--t-muted, #a89bc2) !important; }
+body:has(#resetForm) label { color: var(--t-muted, #a89bc2) !important; font-weight: 700 !important; }
+body:has(#resetForm) input {
+  background: rgba(13, 9, 22, 0.55) !important;
+  border: 1.5px solid rgba(203, 166, 247, 0.16) !important;
+  color: var(--t-text, #f5f1fb) !important;
+  border-radius: 14px !important;
+  padding: 13px 16px !important;
+}
+body:has(#resetForm) input:focus {
+  border-color: #b57bee !important;
+  box-shadow: 0 0 0 4px rgba(181, 123, 238, 0.16) !important;
+  outline: none !important;
+}
+body:has(#resetForm) button[type="submit"] {
+  background: linear-gradient(120deg, #b57bee 0%, #d3a4ef 55%, #eec3e5 100%) !important;
+  color: #241635 !important;
+  border-radius: 999px !important;
+  padding: 14px !important;
+  font-weight: 900 !important;
+  font-size: 15px !important;
+  font-family: "Cairo", "Tajawal", sans-serif !important;
+  box-shadow: 0 12px 34px rgba(181, 123, 238, 0.4) !important;
+  transition: transform 0.2s !important;
+}
+body:has(#resetForm) button[type="submit"]:hover { transform: translateY(-2px) !important; }
+body:has(#resetForm) a { color: var(--t-lav, #c9a2f0) !important; }
+body.light:has(#resetForm) {
+  background: radial-gradient(1100px 640px at 85% -8%, rgba(139, 79, 214, 0.1), transparent 60%), #faf7ff !important;
+}
+body.light:has(#resetForm) main {
+  background: #ffffff !important;
+  border-color: rgba(122, 60, 193, 0.16) !important;
+}
+body.light:has(#resetForm) h1 { color: #241635 !important; }
+body.light:has(#resetForm) input {
+  background: #f7f1ff !important;
+  color: #241635 !important;
+}
+body.light:has(#resetForm) button[type="submit"] { color: #ffffff !important; }

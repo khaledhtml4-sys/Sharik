@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>باقات الاشتراك والأسعار | منصة شارك</title>
+  <link rel="canonical" href="https://sharij-532a3.web.app/app/pricing.html"><meta name="description" content="اختر باقة الاشتراك المناسبة لك لتسريع تعلمك وتبادل مهاراتك بمرونة عالية في منصة شارك." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/saas/saas.css" />
+<link rel="stylesheet" href="/tria-theme.css">
+  <script src="/config.js"></script>
+  <style>
+    .pricing-head {
+      text-align: center;
+      padding: 30px 16px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .pricing-title {
+      font-size: 32px;
+      font-weight: 900;
+      margin: 0 0 12px;
+      background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .pricing-subtitle {
+      color: var(--saas-muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .billing-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--saas-surface);
+      border: 1px solid var(--saas-border);
+      padding: 6px 12px;
+      border-radius: 999px;
+      margin-bottom: 32px;
+    }
+    .toggle-btn {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: var(--saas-muted);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .toggle-btn.active {
+      background: #b57bee;
+      color: white;
+      box-shadow: 0 4px 14px rgba(181,123,238,0.4);
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+      align-items: stretch;
+    }
+    .plan-card {
+      background: var(--saas-surface);
+      border: 1px solid var(--saas-border);
+      border-radius: 24px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+    .plan-card:hover {
+      transform: translateY(-4px);
+      border-color: #b57bee;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    .plan-card.popular {
+      border: 2px solid #b57bee;
+      background: linear-gradient(180deg, rgba(181,123,238,0.08) 0%, var(--saas-surface) 100%);
+      box-shadow: 0 10px 30px rgba(181,123,238,0.15);
+    }
+    .plan-badge {
+      position: absolute;
+      top: -14px;
+      right: 24px;
+      background: linear-gradient(135deg, #b57bee, #8b5cf6);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 14px;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(181,123,238,0.4);
+    }
+    .plan-name {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .plan-price-row {
+      margin: 20px 0;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .price-num {
+      font-size: 42px;
+      font-weight: 900;
+      color: var(--saas-text);
+      line-height: 1;
+    }
+    .price-period {
+      color: var(--saas-muted);
+      font-size: 13px;
+    }
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0 28px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--saas-text);
+      margin-bottom: 12px;
+    }
+    .feature-item .icon {
+      color: #10b981;
+      font-weight: 800;
+    }
+    .current-plan-banner {
+      padding: 16px 24px;
+      border-radius: 16px;
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+  </style>
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+<body class="dark saas-app">
+  <div id="saas-root"></div>
+  <script src="/saas/saas-shell.js"></script>
+  <script>
+    (async function () {
+      const S = window.SharikSaaS;
+      const content = S.mountShell("discover");
+      if (!content) return;
+
+      content.innerHTML = `
+        <div class="pricing-head">
+          <h1 class="pricing-title">💎 باقات الاشتراك والترقية الممتازة</h1>
+          <p class="pricing-subtitle">استمتع بتجربة تعلم وتسريع تبادل مهاراتك بدون قيود مع أدوات الذكاء الاصطناعي وبث الفيديو المباشر.</p>
+          
+          <div class="billing-toggle">
+            <button class="toggle-btn active" id="btnMonthly" onclick="setCycle('monthly')">شهري</button>
+            <button class="toggle-btn" id="btnYearly" onclick="setCycle('yearly')">سنوي <span style="color:#10b981;font-size:11px">(وفّر 20%)</span></button>
+          </div>
+        </div>
+
+        <div id="activeSubscriptionBanner"></div>
+
+        <div class="pricing-grid" id="pricingGrid">
+          ${[1,2,3].map(() => '<div class="plan-card skeleton" style="height:400px"></div>').join('')}
+        </div>
+
+        <div class="saas-card" style="margin-top:30px;text-align:center;padding:32px">
+          <h3 style="font-size:18px;font-weight:800;margin-bottom:8px">🔒 ضمان الأمان والشفافية 100%</h3>
+          <p style="color:var(--saas-muted);font-size:13px;max-width:600px;margin:0 auto 16px">يمكنك تغيير أو إلغاء اشتراكك في أي وقت بسهولة وبدون أي رسوم خفية. جميع عمليات الدفع مشفرة ومحمية ببروتوكولات SSL SSL/TLS.</p>
+          <div style="display:flex;gap:16px;justify-content:center;font-size:24px;opacity:0.8">
+            <span title="Visa / MasterCard">💳</span>
+            <span title="Paymob Integration">📱</span>
+            <span title="Fawry Pay">🏧</span>
+            <span title="Apple Pay">🍎</span>
+          </div>
+        </div>
+      `;
+
+      let cycle = 'monthly';
+      let plans = [];
+      let user = S.getUser() || {};
+
+      async function loadPlans() {
+        try {
+          const res = await S.api('/api/subscription/plans');
+          plans = res.plans || [];
+          renderBanner();
+          renderGrid();
+        } catch (e) {
+          S.toast("فشل جلب خطط الأسعار", "error");
+        }
+      }
+
+      function renderBanner() {
+        const sub = user.subscription || { plan: 'free' };
+        const planName = { free: 'المجانية', pro: 'المتقدمة Pro ⚡', vip: 'كبار الشخصيات VIP 👑' }[sub.plan] || sub.plan;
+        
+        document.getElementById('activeSubscriptionBanner').innerHTML = `
+          <div class="current-plan-banner">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:26px">${sub.plan === 'vip' ? '👑' : sub.plan === 'pro' ? '⚡' : '🌱'}</span>
+              <div>
+                <strong style="font-size:15px;color:var(--saas-text)">أنت حالياً على الباقة: <span style="color:#10b981">${planName}</span></strong>
+                <div style="font-size:12px;color:var(--saas-muted);margin-top:2px">
+                  ${sub.expiresAt ? `ينتهي الاشتراك في: ${new Date(sub.expiresAt).toLocaleDateString('ar-EG')}` : 'باقة مجانية مفتوحة بدون تنشيط'}
+                </div>
+              </div>
+            </div>
+            ${sub.plan !== 'free' ? `
+              <button class="saas-btn saas-btn-ghost" onclick="cancelSubscription()" style="font-size:12px">إلغاء الاشتراك</button>
+            ` : ''}
+          </div>
+        `;
+      }
+
+      window.setCycle = function(c) {
+        cycle = c;
+        document.getElementById('btnMonthly').classList.toggle('active', c === 'monthly');
+        document.getElementById('btnYearly').classList.toggle('active', c === 'yearly');
+        renderGrid();
+      };
+
+      function renderGrid() {
+        const grid = document.getElementById('pricingGrid');
+        const currentPlan = (user.subscription || {}).plan || 'free';
+
+        grid.innerHTML = plans.map(p => {
+          const price = cycle === 'yearly' ? Math.round(p.priceYearly / 12) : p.priceMonthly;
+          const isCurrent = currentPlan === p.id;
+          
+          return `
+            <div class="plan-card ${p.popular ? 'popular' : ''}">
+              <div>
+                ${p.badge ? `<div class="plan-badge">${S.escapeHtml(p.badge)}</div>` : ''}
+                <div class="plan-name">
+                  <span>${S.escapeHtml(p.name)}</span>
+                </div>
+                <div class="plan-price-row">
+                  <span class="price-num">${price}</span>
+                  <span class="price-period">ج.م / شهرياً ${cycle === 'yearly' ? '(توفير سنوي)' : ''}</span>
+                </div>
+                <ul class="feature-list">
+                  ${p.features.map(f => `
+                    <li class="feature-item">
+                      <span class="icon">✓</span>
+                      <span>${S.escapeHtml(f)}</span>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+
+              <div>
+                ${isCurrent ? `
+                  <button class="saas-btn saas-btn-soft" style="width:100%" disabled>باقتك الحالية ✓</button>
+                ` : p.id === 'free' ? `
+                  <button class="saas-btn saas-btn-ghost" style="width:100%" disabled>الباقة الأساسية</button>
+                ` : `
+                  <button class="saas-btn saas-btn-primary" style="width:100%" onclick="openCheckout('${p.id}')">
+                    ترقية الآن إلى ${S.escapeHtml(p.name)} 🚀
+                  </button>
+                `}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      window.openCheckout = function(planId) {
+        const plan = plans.find(p => p.id === planId);
+        if (!plan) return;
+        const price = cycle === 'yearly' ? plan.priceYearly : plan.priceMonthly;
+
+        const overlay = document.createElement('div');
+        overlay.id = 'checkoutModal';
+        overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);";
+        overlay.innerHTML = `
+          <div style="background:var(--saas-surface-solid, #120c1e);border:1px solid var(--saas-border);border-radius:24px;padding:28px;width:100%;max-width:480px;direction:rtl;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
+            <h3 style="margin:0 0 16px;font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px">
+              💳 تأكيد الترقية: ${S.escapeHtml(plan.name)}
+            </h3>
+
+            <div style="background:rgba(255,255,255,0.03);padding:14px;border-radius:14px;border:1px solid var(--saas-border);margin-bottom:20px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px">
+                <span>نوع الاشتراك:</span>
+                <b>${cycle === 'yearly' ? 'اشتراك سنوي (12 شهر)' : 'اشتراك شهري'}</b>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:#10b981;border-top:1px solid var(--saas-border);padding-top:8px;margin-top:8px">
+                <span>الإجمالي المطلوب:</span>
+                <span>${price} ج.م</span>
+              </div>
+            </div>
+
+            <div style="margin-bottom:14px">
+              <label style="display:block;font-size:12px;color:var(--saas-muted);margin-bottom:6px">وسيلة الدفع:</label>
+              <select id="payMethod" class="saas-input">
+                <option value="card">💳 بطاقة ائتمان / ميزة (Credit/Debit)</option>
+                <option value="paymob">📱 Paymob E-Wallet / فودافون كاش</option>
+                <option value="fawry">🏧 فوري Pay (Fawry Code)</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom:14px">
+              <label style="display:block;font-size:12px;color:var(--saas-muted);margin-bottom:6px">رقم البطاقة (تجريبي / Sandbox):</label>
+              <input id="cardNumber" class="saas-input" value="4000 1234 5678 9010" placeholder="0000 0000 0000 0000">
+            </div>
+
+            <div style="display:flex;gap:10px;margin-bottom:20px">
+              <div style="flex:1">
+                <label style="display:block;font-size:12px;color:var(--saas-muted);margin-bottom:6px">تاريخ الانتهاء:</label>
+                <input class="saas-input" value="12/28" placeholder="MM/YY">
+              </div>
+              <div style="flex:1">
+                <label style="display:block;font-size:12px;color:var(--saas-muted);margin-bottom:6px">رمز CVC:</label>
+                <input class="saas-input" value="123" placeholder="123">
+              </div>
+            </div>
+
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+              <button class="saas-btn saas-btn-ghost" onclick="document.getElementById('checkoutModal').remove()">إلغاء</button>
+              <button class="saas-btn saas-btn-primary" id="confirmPayBtn" onclick="submitCheckout('${planId}')">
+                تأكيد ودفع ${price} ج.م ✅
+              </button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+      };
+
+      window.submitCheckout = async function(planId) {
+        const btn = document.getElementById('confirmPayBtn');
+        btn.disabled = true; btn.textContent = "⏳ جاري إتمام الدفع...";
+
+        const payMethod = document.getElementById('payMethod').value;
+        const cardNumber = document.getElementById('cardNumber').value;
+
+        try {
+          const res = await S.api('/api/subscription/checkout', {
+            method: 'POST',
+            body: JSON.stringify({ plan: planId, billingCycle: cycle, paymentMethod: payMethod, cardNumber })
+          });
+          user = res.user || user;
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          S.toast(res.message || "🎉 تم الترقية والتفعيل بنجاح!", "success");
+          document.getElementById('checkoutModal').remove();
+          renderBanner();
+          renderGrid();
+        } catch (e) {
+          S.toast(e.message || "فشلت عملية الدفع", "error");
+          btn.disabled = false; btn.textContent = "تأكيد ودفع ✅";
+        }
+      };
+
+      window.cancelSubscription = async function() {
+        if (!(await SharikConfirm.show("هل أنت تأكد من رغبتك في إلغاء الاشتراك والعودة للباقة المجانية؟", { confirmText: "إلغاء الاشتراك", cancelText: "تراجع" }))) return;
+        try {
+          const res = await S.api('/api/subscription/cancel', { method: 'POST' });
+          user = res.user || user;
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          S.toast("تم إلغاء الاشتراك والعودة للباقة المجانية", "info");
+          renderBanner();
+          renderGrid();
+        } catch (e) {
+          S.toast("فشل إلغاء الاشتراك", "error");
+        }
+      };
+
+      loadPlans();
+    })();
+  </script>
+</body>
+</html>

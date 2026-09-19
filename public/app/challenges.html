@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>التحديات والإنجازات | شارك</title>
+  <meta name="description" content="تحديات شارك الأسبوعية والشهرية وشارات الإنجاز." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/saas/saas.css" />
+<link rel="stylesheet" href="/tria-theme.css">
+  <script src="/config.js"></script>
+  <style>
+    .ch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .ch-card { background: var(--saas-surface); border: 1px solid var(--saas-border); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; }
+    .ch-card.completed { border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.05); }
+    .ch-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .ch-icon { font-size: 28px; }
+    .ch-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #b57bee, #8b5cf6); color: white; }
+    .ch-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .ch-progress-wrap { margin-top: 14px; }
+    .ch-progress-info { display: flex; justify-content: space-between; font-size: 12px; color: var(--saas-muted); margin-bottom: 6px; }
+    
+    .streak-banner {
+      background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(239,68,68,0.15));
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .flame-icon { font-size: 48px; animation: flamePulse 1.5s infinite alternate; }
+    @keyframes flamePulse {
+      from { transform: scale(1); filter: drop-shadow(0 0 10px rgba(245,158,11,0.5)); }
+      to { transform: scale(1.1); filter: drop-shadow(0 0 20px rgba(239,68,68,0.8)); }
+    }
+    
+    .badges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px; margin-top: 16px; }
+    .badge-item { background: var(--saas-surface); border: 1px solid var(--saas-border); border-radius: 14px; padding: 16px; text-align: center; opacity: 0.5; transition: all 0.2s; }
+    .badge-item.earned { opacity: 1; border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05); }
+    .badge-icon { font-size: 36px; margin-bottom: 8px; }
+    .badge-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .badge-desc { font-size: 11px; color: var(--saas-muted); }
+  </style>
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+<body class="dark saas-app">
+  <div id="saas-root"></div>
+  <script src="/saas/saas-shell.js"></script>
+  <script>
+    (async function () {
+      const S = window.SharikSaaS;
+      if (!S.requireAuth()) return;
+      const content = S.mountShell("challenges");
+      if (!content) return;
+
+      function escapeHtml(str) {
+        return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      }
+
+      content.innerHTML = `
+        <div class="saas-page-head">
+          <div>
+            <h1>🏆 التحديات والشارات</h1>
+            <p>أكمل التحديات الأسبوعية والشهرية واكسب XP وشارات تميز ملفك الشخصي</p>
+          </div>
+        </div>
+        <div id="chContainer">
+          <div class="saas-card skeleton" style="height:120px;margin-bottom:24px"></div>
+          <div class="ch-grid">
+            ${[1,2,3,4].map(() => '<div class="saas-card skeleton" style="height:140px"></div>').join('')}
+          </div>
+        </div>
+      `;
+
+      try {
+        const data = await S.api('/api/gamification/profile');
+        const { dailyStreak, points, level, currentLevel, nextLevel, progressToNext, challenges, badges } = data;
+        
+        document.getElementById('chContainer').innerHTML = `
+          <div class="streak-banner">
+            <div style="display:flex;align-items:center;gap:16px">
+              <div class="flame-icon">🔥</div>
+              <div>
+                <div style="font-size:24px;font-weight:800;color:#f59e0b">${dailyStreak} يوم متواصل</div>
+                <div style="font-size:13px;color:var(--saas-muted)">سلسلتك اليومية. ادخل كل يوم لجمع المكافأة!</div>
+              </div>
+            </div>
+            <button class="saas-btn saas-btn-primary" onclick="claimDaily(this)">🎁 جمع مكافأة اليوم (+XP)</button>
+          </div>
+          
+          <div class="saas-card" style="margin-bottom:28px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+              <div>
+                <span style="font-size:13px;color:var(--saas-muted)">المستوى الحالي</span>
+                <div style="font-size:18px;font-weight:800">${currentLevel ? currentLevel.icon : '⭐'} ${escapeHtml(level)}</div>
+              </div>
+              <div style="text-align:left">
+                <div style="font-size:20px;font-weight:800;color:#b57bee">${points} XP</div>
+                ${nextLevel ? `<div style="font-size:12px;color:var(--saas-muted)">المستوى القادم: ${escapeHtml(nextLevel.level)} (${nextLevel.minPoints} XP)</div>` : ''}
+              </div>
+            </div>
+            <div class="saas-progress" style="height:10px">
+              <div class="saas-progress-bar" style="width:${progressToNext}%"></div>
+            </div>
+          </div>
+          
+          <h2 style="font-size:18px;font-weight:800;margin-bottom:16px">⚡ التحديات النشطة</h2>
+          <div class="ch-grid">
+            ${(challenges || []).map(c => `
+              <div class="ch-card ${c.completed ? 'completed' : ''}">
+                <div class="ch-top">
+                  <span class="ch-icon">${c.icon}</span>
+                  <span class="ch-badge">+${c.xpReward} XP</span>
+                </div>
+                <div class="ch-title">${escapeHtml(c.title)}</div>
+                <div class="ch-progress-wrap">
+                  <div class="ch-progress-info">
+                    <span>${c.current} / ${c.target}</span>
+                    <span>${c.completed ? '✅ مكتمل' : `${Math.round((c.current/c.target)*100)}%`}</span>
+                  </div>
+                  <div class="saas-progress" style="height:6px">
+                    <div class="saas-progress-bar" style="width:${Math.min(100, Math.round((c.current/c.target)*100))}%;background:${c.completed ? '#10b981' : '#b57bee'}"></div>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          
+          <h2 style="font-size:18px;font-weight:800;margin-bottom:16px">🎖️ خزانة الشارات</h2>
+          <div class="badges-grid">
+            ${(badges || []).map(b => `
+              <div class="badge-item ${b.earned ? 'earned' : ''}">
+                <div class="badge-icon">${b.icon}</div>
+                <div class="badge-name">${escapeHtml(b.name)}</div>
+                <div class="badge-desc">${escapeHtml(b.description)}</div>
+                ${b.earned ? '<span style="font-size:10px;color:#10b981;font-weight:700;display:block;margin-top:4px">✓ محصلة</span>' : ''}
+              </div>
+            `).join('')}
+          </div>
+
+          <h2 style="font-size:18px;font-weight:800;margin:32px 0 16px">🛍️ متجر استبدال النقاط والجوائز</h2>
+          <div class="ch-grid">
+            <div class="ch-card">
+              <div class="ch-top"><span class="ch-icon">🏅</span><span class="ch-badge" style="background:#f59e0b">500 XP</span></div>
+              <div class="ch-title">شارة "مرشد متميز"</div>
+              <p style="font-size:12px;color:var(--saas-muted);margin:6px 0 14px">إبراز ملفك الشخصي في نتائج البحث والمطابقة بشارة تميز خاصة.</p>
+              <button class="saas-btn saas-btn-soft" style="width:100%" onclick="window.redeemReward('شارة مرشد متميز', 500)">🎁 استبدال بالنقاط</button>
+            </div>
+            <div class="ch-card">
+              <div class="ch-top"><span class="ch-icon">🚀</span><span class="ch-badge" style="background:#b57bee">300 XP</span></div>
+              <div class="ch-title">أولوية المطابقة الذكية</div>
+              <p style="font-size:12px;color:var(--saas-muted);margin:6px 0 14px">رفع ترتيب طلباتك للمطابقة الفورية مع أفضل الخبراء لمدة 14 يوماً.</p>
+              <button class="saas-btn saas-btn-soft" style="width:100%" onclick="window.redeemReward('أولوية المطابقة', 300)">🎁 استبدال بالنقاط</button>
+            </div>
+            <div class="ch-card">
+              <div class="ch-top"><span class="ch-icon">📜</span><span class="ch-badge" style="background:#10b981">800 XP</span></div>
+              <div class="ch-title">تثبيت شهادة مهارة موثقة</div>
+              <p style="font-size:12px;color:var(--saas-muted);margin:6px 0 14px">إصدار شهادة إنجاز واجتياز اختبار مهارة موثقة برمز QR قابل للتحقق.</p>
+              <button class="saas-btn saas-btn-soft" style="width:100%" onclick="window.redeemReward('شهادة موثقة', 800)">🎁 استبدال بالنقاط</button>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        document.getElementById('chContainer').innerHTML = '<div style="text-align:center;padding:40px;color:var(--saas-muted)">تعذّر تحميل التحديات.</div>';
+      }
+
+      window.claimDaily = async function(btn) {
+        btn.disabled = true;
+        try {
+          const data = await S.api('/api/gamification/claim-daily', { method: 'POST' });
+          S.toast(data.message, data.claimed ? 'success' : 'info');
+        } catch (err) {
+          S.toast('خطأ في جمع المكافأة', 'error');
+        } finally {
+          btn.disabled = false;
+        }
+      };
+
+      window.redeemReward = function(title, cost) {
+        S.toast(`طلب استبدال "${title}" بقيمة ${cost} XP قيد المعالجة! 🎉`, 'success');
+      };
+    })();
+  </script>
+</body>
+</html>

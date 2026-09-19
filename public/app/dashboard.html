@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة التحكم | منصة شارك</title>
+  <meta name="description" content="تابع ساعات التعلم والجلسات والمطابقات الموصى بها من لوحة تحكم شارك." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/saas/saas.css" />
+<link rel="stylesheet" href="/tria-theme.css">
+  <script src="/config.js"></script>
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+<body class="dark saas-app">
+  <div id="saas-root"></div>
+  <script src="/saas/saas-shell.js"></script>
+  <script>
+    (async function () {
+      const S = window.SharikSaaS;
+      const content = S.mountShell("dashboard");
+      if (!content) return;
+
+      content.innerHTML = `
+        <div class="saas-page-head">
+          <div>
+            <h1>📊 لوحة التحكم الرئيسية</h1>
+            <p>نظرة عامة على تقدمك التعليمي، جلساتك القادمة، وتوصيات الذكاء الاصطناعي</p>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <a class="saas-btn saas-btn-ghost" href="/app/discover.html">🔍 اكتشف مهارات جديدة</a>
+            <a class="saas-btn saas-btn-primary" href="/login-signup/matching-results.html">⚡ ابحث عن شريك مطابِق</a>
+          </div>
+        </div>
+
+        <div class="saas-grid saas-grid-4" id="statCards">
+          ${[1,2,3,4].map(() => '<div class="saas-card skeleton" style="height:100px"></div>').join("")}
+        </div>
+
+        <div class="saas-grid saas-grid-2" style="margin-top:20px">
+          <div class="saas-card" id="weeklyCard"><div class="skeleton" style="height:220px"></div></div>
+          <div class="saas-card" id="goalsCard"><div class="skeleton" style="height:220px"></div></div>
+        </div>
+
+        <div id="upcomingSection" style="margin-top:20px"></div>
+
+        <div class="saas-grid saas-grid-2" style="margin-top:20px">
+          <div class="saas-card" id="matchesCard"><div class="skeleton" style="height:240px"></div></div>
+          <div class="saas-card" id="activityCard"><div class="skeleton" style="height:240px"></div></div>
+        </div>
+      `;
+
+      let data = {};
+      try { data = await S.api("/api/dashboard"); } catch (e) {}
+      let analytics = null;
+      try { analytics = await S.api("/api/analytics/me"); } catch (e) {}
+      let aiRecs = [];
+      try { const r = await S.api("/api/ai/skill-recommendations"); aiRecs = r.recommendations || []; } catch (e) {}
+
+      const user = S.getUser();
+      const st = data.stats || {};
+      const anStats = analytics?.stats || {};
+
+      const learningHours = (anStats.totalHours != null) ? anStats.totalHours : (st.learningHours || user.learningHours || 0);
+      const completedSessions = (anStats.completedSessions != null) ? anStats.completedSessions : (st.completedSessions || user.completedSessions || 0);
+      const streak = (anStats.streak != null) ? anStats.streak : (st.streak || user.dailyStreak || 0);
+      const xp = st.xp || user.gamifyPoints || 0;
+      const level = st.level || user.gamifyLevel || "عضو مشارك";
+
+      const weekly = (data.weeklyProgress && data.weeklyProgress.length) ? data.weeklyProgress : [
+        { day: "أحد", hours: 0 }, { day: "إثنين", hours: 0 }, { day: "ثلاثاء", hours: 0 },
+        { day: "أربعاء", hours: 0 }, { day: "خميس", hours: 0 }, { day: "جمعة", hours: 0 }, { day: "سبت", hours: 0 }
+      ];
+
+      const goals = (data.goals && data.goals.length) ? data.goals : [
+        { title: "إكمال 3 جلسات هذا الأسبوع", progress: Math.min(100, Math.round((completedSessions / 3) * 100)) },
+        { title: "التحقق من مهارة تعليمية جديدة", progress: (user.verifiedSkills || []).length ? 100 : 25 },
+        { title: "الحفاظ على سلسلة يومية متواصلة", progress: Math.min(100, streak * 20) }
+      ];
+
+      if (!aiRecs.length) {
+        aiRecs = [
+          { skill: "الذكاء الاصطناعي وهندسة الأوامر", reason: "مهارة عالية الطلب لتعزيز إنتاجيتك في البرمجة", confidence: 96 },
+          { skill: "تطوير تطبيقات Web Fullstack", reason: "تناسب اهتماماتك وتزيد فرص المطابقة 3 أضعاف", confidence: 91 },
+          { skill: "أساسيات الأمن السيبراني", reason: "مرغوبة جداً في تبادل المهارات التخصصية", confidence: 84 }
+        ];
+      }
+
+      function esc(str) { return S.escapeHtml(str); }
+
+      // 1. KPI Cards
+      document.getElementById('statCards').innerHTML = `
+        <div class="saas-card" style="display:flex;align-items:center;gap:14px">
+          <div style="width:48px;height:48px;border-radius:14px;background:rgba(181,123,238,0.15);color:#b57bee;display:flex;align-items:center;justify-content:center;font-size:22px">⏱️</div>
+          <div>
+            <div style="font-size:24px;font-weight:800">${learningHours}h</div>
+            <div style="font-size:12px;color:var(--saas-muted)">ساعات التعلم والتبادل</div>
+          </div>
+        </div>
+        <div class="saas-card" style="display:flex;align-items:center;gap:14px">
+          <div style="width:48px;height:48px;border-radius:14px;background:rgba(16,185,129,0.15);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:22px">📅</div>
+          <div>
+            <div style="font-size:24px;font-weight:800">${completedSessions}</div>
+            <div style="font-size:12px;color:var(--saas-muted)">جلسة مكتملة</div>
+          </div>
+        </div>
+        <div class="saas-card" style="display:flex;align-items:center;gap:14px">
+          <div style="width:48px;height:48px;border-radius:14px;background:rgba(245,158,11,0.15);color:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:22px">🔥</div>
+          <div>
+            <div style="font-size:24px;font-weight:800">${streak} يوم</div>
+            <div style="font-size:12px;color:var(--saas-muted)">سلسلة يومية</div>
+          </div>
+        </div>
+        <div class="saas-card" style="display:flex;align-items:center;gap:14px">
+          <div style="width:48px;height:48px;border-radius:14px;background:rgba(139,92,246,0.15);color:#a78bfa;display:flex;align-items:center;justify-content:center;font-size:22px">🏆</div>
+          <div>
+            <div style="font-size:24px;font-weight:800">${xp} XP</div>
+            <div style="font-size:12px;color:var(--saas-muted)">${esc(level)}</div>
+          </div>
+        </div>
+      `;
+
+      // 2. Weekly Progress Chart
+      const maxHours = Math.max(3, ...weekly.map(w => w.hours || 0));
+      document.getElementById('weeklyCard').innerHTML = `
+        <div style="font-weight:700;font-size:16px;margin-bottom:16px">📊 النشاط الأسبوعي (بالساعات)</div>
+        <div style="display:flex;align-items:flex-end;gap:12px;height:140px;padding-top:10px">
+          ${weekly.map(w => {
+            const pct = Math.min(100, Math.round(((w.hours || 0) / maxHours) * 100));
+            return `
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end">
+                <span style="font-size:11px;color:var(--saas-muted)">${w.hours || 0}h</span>
+                <div style="width:100%;background:rgba(181,123,238,0.15);border-radius:6px;overflow:hidden;height:${Math.max(8, pct)}%">
+                  <div style="height:100%;background:linear-gradient(to top, #b57bee, #d3a4ef);border-radius:6px"></div>
+                </div>
+                <span style="font-size:11px;color:var(--saas-muted)">${esc(w.day)}</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      // 3. Target Goals
+      document.getElementById('goalsCard').innerHTML = `
+        <div style="font-weight:700;font-size:16px;margin-bottom:16px">🎯 الأهداف الأسبوعية والتحديات</div>
+        ${goals.map(g => `
+          <div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+              <span>${esc(g.title)}</span>
+              <span style="color:#b57bee;font-weight:700">${g.progress}%</span>
+            </div>
+            <div class="saas-progress" style="height:8px">
+              <div class="saas-progress-bar" style="width:${g.progress}%"></div>
+            </div>
+          </div>
+        `).join('')}
+        <a href="/app/roadmap.html" class="saas-btn saas-btn-ghost" style="width:100%;margin-top:10px;text-align:center;display:block">🗺️ استكشاف خريطة التعلم</a>
+      `;
+
+      // 4. Upcoming Sessions
+      const upcoming = data.upcomingSessions || [];
+      if (upcoming.length) {
+        document.getElementById('upcomingSection').innerHTML = `
+          <div class="saas-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <h3 style="font-size:16px;font-weight:700;margin:0">📅 الجلسات القادمة (${upcoming.length})</h3>
+              <a href="/app/sessions.html" class="saas-btn saas-btn-ghost" style="font-size:12px;padding:4px 12px">عرض الكل</a>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:12px">
+              ${upcoming.map(s => `
+                <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid var(--saas-border);display:flex;flex-direction:column;justify-content:space-between">
+                  <div>
+                    <div style="font-weight:700;font-size:14px;margin-bottom:4px">${esc(s.title || `جلسة ${s.skill || 'تبادل'}`)}</div>
+                    <div style="font-size:12px;color:var(--saas-muted)">⏱️ ${new Date(s.startAt).toLocaleString('ar-EG', {dateStyle:'short', timeStyle:'short'})}</div>
+                  </div>
+                  <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+                    <span class="saas-chip" style="font-size:11px;background:rgba(16,185,129,0.15);color:#10b981">${esc(s.status)}</span>
+                    <a class="saas-btn saas-btn-primary" style="font-size:12px;padding:6px 12px" href="/login-signup/chat.html?chatId=${encodeURIComponent(s.chatId || '')}">🚀 انضمام للجلسة</a>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      // 5. AI Skill Recommendations
+      document.getElementById('matchesCard').innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-weight:700;font-size:16px">🤖 توصيات الذكاء الاصطناعي للمهارات</div>
+          <a href="/app/ai-mentor.html" class="saas-btn saas-btn-ghost" style="padding:4px 12px;font-size:12px">المساعد الذكي 🧠</a>
+        </div>
+        ${aiRecs.slice(0,3).map(r => `
+          <div style="padding:12px 14px;background:rgba(0,0,0,0.2);border:1px solid var(--saas-border);border-radius:14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div>
+              <div style="font-weight:700;font-size:14px">${esc(r.skill)}</div>
+              <div style="font-size:12px;color:var(--saas-muted);margin-top:2px">${esc(r.reason)}</div>
+            </div>
+            <span class="saas-chip" style="background:rgba(181,123,238,0.15);color:#d3a4ef;flex-shrink:0;font-weight:700">${r.confidence || 90}% ثقة</span>
+          </div>
+        `).join('')}
+      `;
+
+      // 6. Activity Heatmap
+      const heatmap = analytics?.heatmap || {};
+      const weeks = 20;
+      const days = [];
+      const now = new Date();
+      for (let i = weeks * 7 - 1; i >= 0; i--) {
+        const d = new Date(now.getTime() - i * 86400000);
+        const key = d.toISOString().slice(0, 10);
+        const count = heatmap[key] || 0;
+        days.push({ key, count });
+      }
+
+      document.getElementById('activityCard').innerHTML = `
+        <div style="font-weight:700;font-size:16px;margin-bottom:12px">🟩 خريطة النشاط والالتزام المستمر</div>
+        <div style="display:grid;grid-template-rows:repeat(7, 13px);grid-auto-flow:column;gap:3px;overflow-x:auto;padding-bottom:8px">
+          ${days.map(d => {
+            const bg = d.count >= 3 ? '#10b981' : d.count >= 2 ? '#34d399' : d.count >= 1 ? '#059669' : 'rgba(255,255,255,0.05)';
+            return `<div style="width:13px;height:13px;border-radius:3px;background:${bg}" title="${d.key}: ${d.count} نشاط مسجل"></div>`;
+          }).join('')}
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--saas-muted);margin-top:10px">
+          <span>أقل نشاط</span>
+          <div style="display:flex;gap:4px;align-items:center">
+            <div style="width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,0.05)"></div>
+            <div style="width:10px;height:10px;border-radius:2px;background:#059669"></div>
+            <div style="width:10px;height:10px;border-radius:2px;background:#34d399"></div>
+            <div style="width:10px;height:10px;border-radius:2px;background:#10b981"></div>
+          </div>
+          <span>أكثر نشاط</span>
+        </div>
+      `;
+    })();
+  </script>
+</body>
+</html>

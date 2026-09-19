@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة المتصدرين | شارك</title>
+  <meta name="description" content="ترتيب أفضل المرشدين والمتعلمين حسب XP والجلسات والشارات في منصة شارك." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://sharij-532a3.web.app/app/leaderboard.html" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/saas/saas.css" />
+<link rel="stylesheet" href="/tria-theme.css">
+  <script src="/config.js"></script>
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+<body class="dark saas-app">
+  <div id="saas-root"></div>
+  <script src="/saas/saas-shell.js"></script>
+  <script>
+    (async function () {
+      const S = window.SharikSaaS;
+      if (!S.requireAuth()) return;
+      const content = S.mountShell("leaderboard");
+      if (!content) return;
+
+      let type = "mentors";
+
+      content.innerHTML = `
+        <div class="saas-page-head">
+          <div>
+            <h1>🏆 المتصدرون والجوائز</h1>
+            <p>XP، المستويات، السلاسل اليومية، وأفضل المساهمين في المجتمع</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="saas-btn saas-btn-primary" id="tabMentors">أفضل المرشدين</button>
+            <button class="saas-btn saas-btn-ghost" id="tabLearners">أفضل المتعلمين</button>
+          </div>
+        </div>
+        <div class="saas-grid saas-grid-3" id="podium"></div>
+        <div class="saas-card" style="margin-top:16px" id="list"></div>
+      `;
+
+      async function load() {
+        let leaders = [];
+        try {
+          const data = await S.api("/api/leaderboard?type=" + type);
+          leaders = data.leaders || [];
+        } catch {
+          leaders = [
+            { rank: 1, name: "أحمد علي", xp: 920, level: "أسطورة شارك", rating: 4.9, sessions: 48, streak: 12, badges: ["Top Mentor"], focus: ["UI/UX"] },
+            { rank: 2, name: "سارة حسن", xp: 810, level: "معلّم خبير", rating: 4.8, sessions: 40, streak: 9, badges: ["Streak"], focus: ["JavaScript"] },
+            { rank: 3, name: "كريم نبيل", xp: 760, level: "معلّم خبير", rating: 4.7, sessions: 35, streak: 7, badges: ["Verified"], focus: ["Python"] },
+          ];
+        }
+
+        const top = leaders.slice(0, 3);
+        document.getElementById("podium").innerHTML = top.map((u, i) => `
+          <div class="saas-card" style="text-align:center;order:${i === 0 ? 2 : i === 1 ? 1 : 3}">
+            <div style="font-size:2rem;margin-bottom:8px">${i === 0 ? "🥇" : i === 1 ? "🥈" : "🥉"}</div>
+            <div class="saas-avatar" style="width:64px;height:64px;margin:0 auto 10px;font-size:1.4rem">${S.escapeHtml((u.name || "?").charAt(0))}</div>
+            <h3>${S.escapeHtml(u.name)}</h3>
+            <div class="saas-chip success">${u.xp} XP</div>
+            <p style="color:var(--saas-muted);margin:10px 0 0">${S.escapeHtml(u.level || "")}</p>
+          </div>
+        `).join("");
+
+        document.getElementById("list").innerHTML = `
+          <h2>الترتيب الكامل</h2>
+          ${leaders.map((u) => `
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--saas-border)">
+              <div style="display:flex;gap:12px;align-items:center">
+                <strong style="width:28px;color:var(--saas-muted)">#${u.rank}</strong>
+                <div class="saas-avatar">${S.escapeHtml((u.name || "?").charAt(0))}</div>
+                <div>
+                  <strong>${S.escapeHtml(u.name)} ${u.isVerified ? "✓" : ""}</strong>
+                  <div style="color:var(--saas-muted);font-size:.82rem">${(u.focus || []).join(" · ")} · ${S.escapeHtml(u.level || "")}</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+                    ${(u.badges || []).map((b) => `<span class="saas-chip">${S.escapeHtml(b)}</span>`).join("")}
+                    <span class="saas-chip">🔥 ${u.streak || 0}</span>
+                  </div>
+                </div>
+              </div>
+              <div style="text-align:left">
+                <div><strong>${u.xp}</strong> XP</div>
+                <div class="stars" style="font-size:.8rem">${S.stars(u.rating)} ${u.rating || 0}</div>
+                <div style="color:var(--saas-muted);font-size:.8rem">${u.sessions || 0} جلسة</div>
+              </div>
+            </div>
+          `).join("")}
+        `;
+      }
+
+      document.getElementById("tabMentors").addEventListener("click", () => {
+        type = "mentors";
+        document.getElementById("tabMentors").className = "saas-btn saas-btn-primary";
+        document.getElementById("tabLearners").className = "saas-btn saas-btn-ghost";
+        load();
+      });
+
+      document.getElementById("tabLearners").addEventListener("click", () => {
+        type = "learners";
+        document.getElementById("tabLearners").className = "saas-btn saas-btn-primary";
+        document.getElementById("tabMentors").className = "saas-btn saas-btn-ghost";
+        load();
+      });
+
+      load();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>إنشاء حساب جديد مجاني | منصة شارك</title>
+  <meta name="robots" content="noindex, follow"><meta name="description" content="أنشئ حسابك مجاناً في منصة شارك وانضم لأكبر مجتمع تقني لتبادل المهارات والخبرات." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./main.css" />
+  <link rel="stylesheet" href="../ui-system.css" />
+  <link rel="stylesheet" href="/unified-header.css" />
+  <link rel="stylesheet" href="/tria-theme.css" />
+  <link rel="stylesheet" href="/auth-theme.css" />
+  <style>
+    .split-auth-wrap {
+      min-height: calc(100vh - 72px);
+      margin-top: 72px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #0d0916;
+    }
+    .auth-form-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 24px;
+      position: relative;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 460px;
+      background: rgba(18, 28, 48, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 24px;
+      padding: 36px 30px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    .auth-hero-side {
+      background: linear-gradient(135deg, #120c1e 0%, #2a1a45 50%, #0d0916 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px;
+      position: relative;
+      overflow: hidden;
+      border-inline-start: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .auth-hero-side::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 70% 30%, rgba(16, 185, 129, 0.25), transparent 60%),
+                  radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.2), transparent 50%);
+    }
+    .auth-input-group {
+      margin-bottom: 18px;
+    }
+    .auth-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+    .auth-input {
+      width: 100%;
+      padding: 13px 18px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #f8fafc;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .auth-input:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      background: rgba(15, 23, 42, 0.9);
+    }
+    .auth-submit-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #10b981, #b57bee);
+      color: white;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .auth-submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(16, 185, 129, 0.45);
+    }
+    @media (max-width: 900px) {
+      .split-auth-wrap { grid-template-columns: 1fr; }
+      .auth-hero-side { display: none; }
+    }
+  </style>
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+<body class="dark">
+  <header id="header">
+    <div class="logo">
+      <a href="/index.html"><img class="logo-img" src="/images/logo.svg" alt="شارك" width="195" height="52" decoding="async"></a>
+    </div>
+    <button class="menu-icon" id="menuBtn" aria-label="القائمة" aria-expanded="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <nav class="nav" id="mainNav">
+      <a href="/index.html">الرئيسية</a>
+      <a href="/work/work.html">كيف تعمل المنصة</a>
+      <a href="/blogs/blogs.html">المدونة</a>
+      <a href="/Matching/matching.html">المطابقة</a>
+    </nav>
+    <div class="header-actions">
+      <a href="/login-signup/login.html"><button class="btn-login">تسجيل الدخول</button></a>
+      <div class="theme-switcher">
+        <button id="themeBtn" aria-label="تغيير الوضع">🌙</button>
+      </div>
+    </div>
+  </header>
+  <script src="/unified-header.js?v=2" defer></script>
+
+  <main class="split-auth-wrap">
+    <div class="auth-form-side">
+      <div class="auth-card">
+        <div style="text-align:center;margin-bottom:24px">
+          <h2 style="font-size:26px;font-weight:900;margin:0 0 8px;color:#f8fafc" data-i18n="au.signup.t">انضم إلى شارك مجاناً 🚀</h2>
+          <p style="color:#94a3b8;font-size:14px;margin:0" data-i18n="au.signup.s">أنشئ حسابك وابدأ التبادل والتطوير الآن</p>
+        </div>
+
+        <form id="signupForm" method="post">
+          <div style="display:flex;gap:12px">
+            <div class="auth-input-group" style="flex:1">
+              <label for="inputName" class="auth-label" data-i18n="au.first">الاسم الأول:</label>
+              <input id="inputName" class="auth-input" type="text" required placeholder="أحمد" autocomplete="given-name" name="username1" />
+            </div>
+            <div class="auth-input-group" style="flex:1">
+              <label for="inputName2" class="auth-label" data-i18n="au.last">اسم العائلة:</label>
+              <input id="inputName2" class="auth-input" type="text" required placeholder="محمد" autocomplete="family-name" name="username2" />
+            </div>
+          </div>
+
+          <div class="auth-input-group">
+            <label for="inputEmail" class="auth-label" data-i18n="au.email">البريد الإلكتروني:</label>
+            <input id="inputEmail" class="auth-input" type="email" placeholder="example@gmail.com" required autocomplete="email" name="email" />
+          </div>
+
+          <div class="auth-input-group">
+            <label for="inputPassword" class="auth-label" data-i18n="au.password">كلمة المرور:</label>
+            <input class="auth-input" type="password" placeholder="••••••••" id="inputPassword" required autocomplete="new-password" name="password" minlength="6" />
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;font-size:13px;color:#94a3b8">
+            <input type="checkbox" id="showPw" onchange="document.getElementById('inputPassword').type = this.checked ? 'text' : 'password'" style="accent-color:#10b981;cursor:pointer">
+            <label for="showPw" style="cursor:pointer" data-i18n="au.show">إظهار كلمة المرور</label>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:24px;font-size:12px;color:#94a3b8;line-height:1.5">
+            <input id="inputCheckbox" name="checkbox" type="checkbox" required style="accent-color:#10b981;margin-top:2px;cursor:pointer" />
+            <label for="inputCheckbox" style="cursor:pointer">
+              <span data-i18n="au.terms.pre">أوافق على</span> <a href="/footer/Provisions.html" style="color:#d3a4ef;text-decoration:none" data-i18n="au.terms.toc">الشروط والأحكام</a> <span data-i18n="au.terms.and">و</span> <a href="/footer/conditions.html" style="color:#d3a4ef;text-decoration:none" data-i18n="au.terms.pp">سياسة الخصوصية</a>
+            </label>
+          </div>
+
+          <button id="inputSubmit" class="auth-submit-btn" type="submit" data-i18n="au.submitUp">إنشاء الحساب والمتابعة ✦</button>
+
+          <div style="text-align:center;margin-top:20px;font-size:14px;color:#94a3b8">
+            <span data-i18n="au.haveacc">لديك حساب بالفعل؟</span> <a href="login.html" style="color:#10b981;font-weight:700;text-decoration:none" data-i18n="cta.login">تسجيل الدخول</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="auth-hero-side">
+      <div style="position:relative;z-index:2;max-width:500px">
+        <div style="display:inline-block;padding:6px 16px;border-radius:999px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#34d399;font-size:12px;font-weight:800;margin-bottom:20px">
+          <span data-i18n="au.badge">🎉 حساب مجاني مدى الحياة ✦</span>
+        </div>
+        <h1 style="font-size:36px;font-weight:900;line-height:1.3;margin:0 0 16px;color:white">
+          <span data-i18n="au.hero.h">اكسب ميزة تنافسية في وقت قياسي</span>
+        </h1>
+        <p style="color:#94a3b8;font-size:16px;line-height:1.7;margin-bottom:32px">
+          <span data-i18n="au.hero.p">التحق بمنصة تبادل المهارات التقنية، واحصل على توثيق معتمد لمهاراتك، وطوّر مستواك التقني مع خبراء ومطورين حقيقيين.</span>
+        </p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div style="padding:16px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08)">
+            <div style="font-size:24px;margin-bottom:6px">🏅</div>
+            <strong style="color:white;font-size:14px;display:block" data-i18n="au.hero.c1">شهادات معتمدة</strong>
+            <span style="font-size:12px;color:#94a3b8" data-i18n="au.hero.c1s">أثبت مهاراتك عبر اختبارات المهارات</span>
+          </div>
+          <div style="padding:16px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08)">
+            <div style="font-size:24px;margin-bottom:6px">💎</div>
+            <strong style="color:white;font-size:14px;display:block" data-i18n="au.hero.c2">نقاط خبرة وترتيب</strong>
+            <span style="font-size:12px;color:#94a3b8" data-i18n="au.hero.c2s">تنافس في لوحة المتصدرين</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/config.js?v=20260725"></script>
+  <script src="./signup.js?v=20260725"></script>
+  <script src="/auth.js" defer></script>
+  <script src="/icons.js" defer></script>
+</body>
+</html>

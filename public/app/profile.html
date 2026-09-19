@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الملف الشخصي | منصة شارك</title>
+  <meta name="robots" content="noindex, follow"><meta name="description" content="إدارة ملفك الشخصي، المهارات، الإنجازات، وسجل الأمان في منصة شارك." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/saas/saas.css" />
+<link rel="stylesheet" href="/tria-theme.css">
+  
+<script src="/config.js"></script>
+  <style>
+    .prof-banner {
+      height: 160px;
+      border-radius: 24px 24px 0 0;
+      background: linear-gradient(135deg, #120c1e 0%, #2a1a45 40%, #120c1e 100%);
+      position: relative;
+      border: 1px solid var(--saas-border);
+      border-bottom: none;
+      overflow: hidden;
+    }
+    .prof-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(139,79,214,0.3), transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(181,123,238,0.25), transparent 60%);
+    }
+    .prof-banner::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0; right: 0;
+      height: 40px;
+      background: linear-gradient(to top, var(--saas-surface), transparent);
+    }
+    .prof-header-card {
+      background: var(--saas-surface);
+      border: 1px solid var(--saas-border);
+      border-radius: 0 0 24px 24px;
+      padding: 0 28px 24px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .prof-avatar-wrapper {
+      position: relative;
+      margin-top: -54px;
+      margin-bottom: 16px;
+      display: inline-block;
+      z-index: 2;
+    }
+    .prof-avatar {
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #b57bee, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      font-weight: 800;
+      color: white;
+      overflow: hidden;
+      border: 4px solid var(--saas-surface-solid, #120c1e);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .prof-avatar:hover { transform: scale(1.04); }
+    .prof-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .prof-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .prof-name {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .prof-meta-line {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--saas-muted);
+      font-size: 13px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .prof-tabs {
+      display: flex;
+      gap: 6px;
+      border-bottom: 2px solid var(--saas-border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 0;
+      scrollbar-width: none;
+    }
+    .prof-tab-btn {
+      padding: 12px 18px;
+      border-radius: 12px 12px 0 0;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      color: var(--saas-muted);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .prof-tab-btn:hover { color: var(--saas-text); background: rgba(255,255,255,0.04); }
+    .prof-tab-btn.active { color: #b57bee; border-bottom-color: #b57bee; background: rgba(181,123,238,0.06); }
+    .skill-chip {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .chip-teach { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+    .chip-learn { background: rgba(181,123,238,0.12); color: #d3a4ef; border: 1px solid rgba(181,123,238,0.3); }
+    .chip-verified { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); }
+    .portfolio-card {
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: var(--saas-surface);
+      border: 1px solid var(--saas-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .portfolio-card:hover { border-color: #b57bee; transform: translateY(-1px); }
+    .review-card {
+      padding: 16px 20px;
+      border-radius: 16px;
+      background: var(--saas-surface);
+      border: 1px solid var(--saas-border);
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+    .review-card:hover { border-color: rgba(245,158,11,0.3); }
+    .login-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1.2fr 1fr 1fr 1.5fr;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--saas-border);
+      align-items: center;
+      font-size: 13px;
+    }
+    .login-row:last-child { border-bottom: none; }
+    .login-row.header { font-size: 11px; color: var(--saas-muted); font-weight: 700; text-transform: uppercase; }
+    .security-alert {
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(181,123,238,0.3);
+      background: rgba(181,123,238,0.06);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 600px) {
+      .login-row { grid-template-columns: 1fr 1fr; font-size: 12px; }
+      .login-row .hide-mobile { display: none; }
+    }
+  </style>
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+<body class="dark saas-app">
+  <div id="saas-root"></div>
+  <script src="/saas/saas-shell.js"></script>
+  <script>
+    (async function () {
+      const S = window.SharikSaaS;
+      if (!S.requireAuth()) return;
+      const content = S.mountShell("profile");
+      if (!content) return;
+
+      content.innerHTML = `
+        <div class="prof-banner"></div>
+        <div id="profileHeader">
+          <div class="prof-header-card" style="min-height:140px">
+            <div class="skeleton" style="height:60px;margin-top:20px;border-radius:12px"></div>
+          </div>
+        </div>
+
+        <div class="prof-tabs">
+          <button class="prof-tab-btn active" data-tab="overview" onclick="switchTab('overview')">📊 نظرة عامة والمهارات</button>
+          <button class="prof-tab-btn" data-tab="experience" onclick="switchTab('experience')">💼 الخبرات والمعرض</button>
+          <button class="prof-tab-btn" data-tab="reviews" onclick="switchTab('reviews')">⭐ التقييمات</button>
+          <button class="prof-tab-btn" data-tab="achievements" onclick="switchTab('achievements')">🏆 الأوسمة</button>
+          <button class="prof-tab-btn" data-tab="security" onclick="switchTab('security')">🔒 الأمان والنشاط</button>
+        </div>
+
+        <div id="tabContent">
+          <div class="saas-card skeleton" style="height:300px"></div>
+        </div>
+      `;
+
+      let user = null;
+      let securityData = null;
+      let activeTab = 'overview';
+
+      async function loadProfile() {
+        try {
+          const data = await S.api('/api/me');
+          user = data.user || data;
+          renderHeader();
+          renderActiveTab();
+        } catch (err) {
+          S.toast("فشل تحميل بيانات الملف الشخصي", "error");
+        }
+      }
+
+      async function loadSecurity() {
+        if (securityData) return securityData;
+        try {
+          securityData = await S.api('/api/me/security');
+          return securityData;
+        } catch (e) {
+          return { loginHistory: [], lastLoginAt: null };
+        }
+      }
+
+      function renderHeader() {
+        if (!user) return;
+        const name = `${user.username1 || ''} ${user.username2 || ''}`.trim() || user.name || (user.email || '').split('@')[0];
+        const initial = String(name).charAt(0).toUpperCase();
+        const totalSkills = (user.teachSkills || []).length + (user.learnSkills || []).length;
+        const reviewCount = (user.reviews || []).length;
+        const avgRating = reviewCount ? (user.reviews.reduce((a, r) => a + (r.rating || 5), 0) / reviewCount).toFixed(1) : '5.0';
+
+        document.getElementById('profileHeader').innerHTML = `
+          <div class="prof-header-card">
+            <div style="display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap">
+              <div class="prof-avatar-wrapper" onclick="openAvatarUpload()">
+                <div class="prof-avatar" title="اضغط لتغيير الصورة الشخصية">
+                  ${user.avatar ? `<img src="${S.escapeHtml(user.avatar)}" alt="${S.escapeHtml(name)}">` : S.escapeHtml(initial)}
+                </div>
+                <div style="position:absolute;bottom:2px;left:2px;width:28px;height:28px;background:#b57bee;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid var(--saas-surface-solid,#120c1e)">📷</div>
+              </div>
+              <div style="flex:1;min-width:200px;padding-bottom:8px">
+                <h1 class="prof-name">
+                  ${S.escapeHtml(name)}
+                  ${user.isVerified ? '<span style="color:#10b981;font-size:18px" title="حساب موثق">✓</span>' : ''}
+                  <span class="saas-chip" style="font-size:11px;background:rgba(181,123,238,0.15);color:#d3a4ef;font-weight:700">
+                    ${user.role === 'super_admin' ? '🔑 Super Admin' : user.role === 'admin' ? '🛡️ أدمن' : user.gamifyLevel || 'عضو مشارك'}
+                  </span>
+                </h1>
+                <div class="prof-meta-line">
+                  <span>✉️ ${S.escapeHtml(user.email)}</span>
+                  <span>📍 ${S.escapeHtml(user.country || 'مصر')}</span>
+                  <span>📅 ${new Date(user.createdAt || Date.now()).toLocaleDateString('ar-EG', {month:'long', year:'numeric'})}</span>
+                  ${user.dailyStreak > 0 ? `<span style="color:#f59e0b">🔥 ${user.dailyStreak} يوم متواصل</span>` : ''}
+                </div>
+                <p style="color:var(--saas-text);font-size:14px;margin:0 0 16px;max-width:700px;line-height:1.6">${S.escapeHtml(user.bio || 'لم تتم إضافة نبذة شخصية بعد. اضغط "تعديل الملف الشخصي" لإضافة بياناتك.')}</p>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:24px;flex-wrap:wrap;margin:16px 0;padding:16px 0;border-top:1px solid var(--saas-border);border-bottom:1px solid var(--saas-border)">
+              <div style="text-align:center">
+                <div style="font-size:22px;font-weight:800;color:#b57bee">${user.gamifyPoints || 0}</div>
+                <div style="font-size:11px;color:var(--saas-muted);margin-top:2px">نقاط XP</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:22px;font-weight:800;color:#10b981">${user.completedSessions || 0}</div>
+                <div style="font-size:11px;color:var(--saas-muted);margin-top:2px">جلسة مكتملة</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:22px;font-weight:800;color:#f59e0b">${totalSkills}</div>
+                <div style="font-size:11px;color:var(--saas-muted);margin-top:2px">مهارة</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:22px;font-weight:800;color:#a78bfa">⭐ ${avgRating}</div>
+                <div style="font-size:11px;color:var(--saas-muted);margin-top:2px">${reviewCount} تقييم</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:22px;font-weight:800;color:#ec4899">${(user.followers || []).length}</div>
+                <div style="font-size:11px;color:var(--saas-muted);margin-top:2px">متابع</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+              <button class="saas-btn saas-btn-primary" onclick="openEditModal()">✏️ تعديل البروفايل</button>
+              <button class="saas-btn saas-btn-soft" onclick="copyShareLink()">🔗 مشاركة</button>
+              <a class="saas-btn saas-btn-ghost" href="/app/sessions.html">📅 جلساتي</a>
+              <a class="saas-btn saas-btn-ghost" href="/login-signup/matching-results.html">⚡ البحث عن شريك</a>
+            </div>
+          </div>
+        `;
+        if (!document.getElementById('avatarFileInput')) {
+          const inp = document.createElement('input');
+          inp.id = 'avatarFileInput'; inp.type = 'file'; inp.accept = 'image/*'; inp.style.display = 'none';
+          inp.onchange = handleAvatarChange;
+          document.body.appendChild(inp);
+        }
+      }
+
+      window.switchTab = function(tabName) {
+        activeTab = tabName;
+        document.querySelectorAll('.prof-tab-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.tab === tabName);
+        });
+        renderActiveTab();
+      };
+
+      async function renderActiveTab() {
+        if (!user) return;
+        const container = document.getElementById('tabContent');
+
+        if (activeTab === 'overview') {
+          container.innerHTML = `
+            <div class="saas-grid saas-grid-2" style="margin-bottom:24px">
+              <div class="saas-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:14px">🎓 مهارات أُعلّمها وأُشاركها</h3>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  ${(user.teachSkills || []).length > 0
+                    ? user.teachSkills.map(s => {
+                        const isVer = (user.verifiedSkills || []).includes(s);
+                        const testRes = user.skillTestResults?.[s];
+                        return `<span class="skill-chip ${isVer ? 'chip-verified' : 'chip-teach'}" title="${isVer ? 'مهارة موثقة بـ Skill Test' : 'مهارة معلنة'}">
+                          ${isVer ? '⭐' : '🎓'} ${S.escapeHtml(s)}
+                          ${testRes ? `<small style="opacity:.7">${testRes.pct}%</small>` : ''}
+                        </span>`;
+                      }).join('')
+                    : '<span style="color:var(--saas-muted);font-size:13px">لم تُحدد مهارات تدريس بعد. اذهب إلى <a href="/login-signup/skills-selection.html" style="color:#d3a4ef">اختيار المهارات</a></span>'
+                  }
+                </div>
+              </div>
+
+              <div class="saas-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:14px">💡 مهارات أتعلمها وأستهدفها</h3>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  ${(user.learnSkills || []).length > 0
+                    ? user.learnSkills.map(s => `<span class="skill-chip chip-learn">💡 ${S.escapeHtml(s)}</span>`).join('')
+                    : '<span style="color:var(--saas-muted);font-size:13px">لم تُحدد مهارات تعلم بعد</span>'
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="saas-card">
+              <h3 style="font-size:16px;font-weight:700;margin-bottom:14px">👥 معلومات التواصل والتفاعل</h3>
+              <div class="saas-grid saas-grid-4">
+                ${[
+                  { label: 'الدولة', val: user.country || 'مصر', icon: '🌍' },
+                  { label: 'اللغات', val: (user.languages || ['العربية']).join('، '), icon: '🗣️' },
+                  { label: 'الجلسات المكتملة', val: user.completedSessions || 0, icon: '✅' },
+                  { label: 'الجلسات كمعلم', val: user.teachingSessions || 0, icon: '🎓' },
+                ].map(i => `<div style="text-align:center;padding:12px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid var(--saas-border)">
+                  <div style="font-size:24px">${i.icon}</div>
+                  <div style="font-size:15px;font-weight:700;margin:4px 0">${S.escapeHtml(String(i.val))}</div>
+                  <div style="font-size:11px;color:var(--saas-muted)">${i.label}</div>
+                </div>`).join('')}
+              </div>
+            </div>
+          `;
+        } else if (activeTab === 'experience') {
+          const links = user.portfolioLinks || [];
+          const certs = user.certificates || [];
+          container.innerHTML = `
+            <div class="saas-card" style="margin-bottom:20px">
+              <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">💼 الخبرة والنبذة التخصصية</h3>
+              <p style="line-height:1.8;color:var(--saas-text);white-space:pre-line;margin:0;font-size:14px">${S.escapeHtml(user.experience || 'لم تقم بإضافة ملخص خبراتك حتى الآن. أضف خبرتك من "تعديل البروفايل".')}</p>
+            </div>
+
+            <div class="saas-grid saas-grid-2">
+              <div class="saas-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:14px">🔗 معرض الأعمال والتواصل</h3>
+                ${links.length ? links.map(l => `
+                  <div class="portfolio-card" style="margin-bottom:8px">
+                    <div>
+                      <strong style="font-size:14px">${S.escapeHtml(l.title || 'مشروع')}</strong>
+                      <div style="font-size:12px;color:var(--saas-muted);margin-top:2px;word-break:break-all">${S.escapeHtml(l.url)}</div>
+                    </div>
+                    <a class="saas-btn saas-btn-soft" href="${S.escapeHtml(l.url)}" target="_blank" rel="noopener" style="white-space:nowrap">زيارة ↗</a>
+                  </div>
+                `).join('') : '<p style="color:var(--saas-muted);font-size:13px">لا توجد روابط مضافة حتى الآن.</p>'}
+              </div>
+
+              <div class="saas-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:14px">📜 الشهادات الموثقة</h3>
+                ${certs.length ? certs.map(c => `
+                  <div class="portfolio-card" style="margin-bottom:8px">
+                    <div>
+                      <strong style="font-size:14px">${S.escapeHtml(c.title || 'شهادة')}</strong>
+                      <div style="font-size:12px;color:var(--saas-muted);margin-top:2px">${S.escapeHtml(c.issuer || 'جهة عامة')} • ${S.escapeHtml(c.year || '2026')}</div>
+                    </div>
+                    ${c.url ? `<a class="saas-btn saas-btn-soft" href="${S.escapeHtml(c.url)}" target="_blank" rel="noopener">عرض 📄</a>` : '<span class="saas-chip" style="font-size:11px">معتمدة</span>'}
+                  </div>
+                `).join('') : '<p style="color:var(--saas-muted);font-size:13px">لا توجد شهادات مضافة حالياً.</p>'}
+              </div>
+            </div>
+          `;
+        } else if (activeTab === 'reviews') {
+          const reviews = user.reviews || [];
+          const avg = reviews.length ? (reviews.reduce((a, r) => a + (r.rating || 5), 0) / reviews.length).toFixed(1) : '—';
+          const dist = [5,4,3,2,1].map(n => ({ n, count: reviews.filter(r => Math.round(r.rating) === n).length }));
+          container.innerHTML = `
+            <div class="saas-card" style="margin-bottom:20px">
+              <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+                <div style="text-align:center">
+                  <div style="font-size:52px;font-weight:900;color:#f59e0b;line-height:1">${avg}</div>
+                  <div style="font-size:22px;margin:4px 0">⭐⭐⭐⭐⭐</div>
+                  <div style="font-size:12px;color:var(--saas-muted)">${reviews.length} تقييم</div>
+                </div>
+                <div style="flex:1;min-width:180px">
+                  ${dist.map(d => `
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px">
+                      <span style="width:20px;text-align:center">${d.n}★</span>
+                      <div style="flex:1;height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden">
+                        <div style="height:100%;width:${reviews.length ? Math.round((d.count/reviews.length)*100) : 0}%;background:#f59e0b;border-radius:4px;transition:width 0.5s"></div>
+                      </div>
+                      <span style="width:24px;text-align:left;color:var(--saas-muted)">${d.count}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+            ${reviews.length ? reviews.map(r => `
+              <div class="review-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(181,123,238,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#d3a4ef">${String(r.reviewerName || 'م').charAt(0)}</div>
+                    <div>
+                      <div style="font-weight:700;font-size:14px">${S.escapeHtml(r.reviewerName || r.reviewerEmail || 'متعلم')}</div>
+                      <div style="font-size:11px;color:var(--saas-muted)">${S.escapeHtml(r.skill || 'تبادل عام')} • ${new Date(r.date || Date.now()).toLocaleDateString('ar-EG')}</div>
+                    </div>
+                  </div>
+                  <div style="color:#f59e0b;font-size:16px">${'★'.repeat(Math.round(r.rating || 5))}${'☆'.repeat(5-Math.round(r.rating||5))}</div>
+                </div>
+                <p style="font-size:13px;line-height:1.7;margin:0;color:var(--saas-text)">${S.escapeHtml(r.comment || 'تجربة ممتازة ومفيدة جداً!')}</p>
+              </div>
+            `).join('') : '<div class="saas-card" style="text-align:center;padding:40px;color:var(--saas-muted)">⭐ لا توجد تقييمات مسجلة بعد.<br><small style="font-size:12px;margin-top:8px;display:block">أتمم جلساتك الأولى للحصول على تقييمات من شركائك!</small></div>'}
+          `;
+        } else if (activeTab === 'achievements') {
+          const badges = (user.badges || []).length ? user.badges : ['عضو شارك', 'مستكشف التعلم'];
+          const pts = user.gamifyPoints || 0;
+          const nextLevel = pts < 100 ? 100 : pts < 300 ? 300 : pts < 600 ? 600 : pts < 1000 ? 1000 : 2000;
+          const prevLevel = pts < 100 ? 0 : pts < 300 ? 100 : pts < 600 ? 300 : pts < 1000 ? 600 : 1000;
+          const progress = Math.round(((pts - prevLevel) / (nextLevel - prevLevel)) * 100);
+          container.innerHTML = `
+            <div class="saas-card" style="margin-bottom:20px">
+              <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">🎯 مستوى XP والتقدم في المنصة</h3>
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+                <div style="font-size:36px;font-weight:900;color:#a78bfa">${pts.toLocaleString('ar-EG')}</div>
+                <div>
+                  <div style="font-size:14px;font-weight:700">${S.escapeHtml(user.gamifyLevel || 'عضو جديد')}</div>
+                  <div style="font-size:12px;color:var(--saas-muted)">المستوى الحالي</div>
+                </div>
+                <div style="margin-right:auto;text-align:left">
+                  <div style="font-size:12px;color:var(--saas-muted);margin-bottom:4px">التالي: ${nextLevel.toLocaleString()} XP</div>
+                  <div style="font-size:13px;font-weight:700;color:#8b5cf6">${progress}%</div>
+                </div>
+              </div>
+              <div class="saas-progress" style="height:12px;border-radius:8px">
+                <div class="saas-progress-bar" style="width:${progress}%;background:linear-gradient(90deg,#8b5cf6,#b57bee);border-radius:8px"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--saas-muted);margin-top:6px">
+                <span>${prevLevel} XP</span>
+                <span>${nextLevel} XP</span>
+              </div>
+            </div>
+
+            <div class="saas-card">
+              <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">🎖️ الأوسمة والشارات المكتسبة</h3>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:12px">
+                ${badges.map((b, i) => `
+                  <div style="padding:20px 14px;border-radius:18px;background:rgba(${i%2?'139,92,246':'59,130,246'},0.07);border:1px solid rgba(${i%2?'139,92,246':'59,130,246'},0.25);text-align:center;transition:transform 0.2s" onmouseenter="this.style.transform='scale(1.04)'" onmouseleave="this.style.transform='scale(1)'">
+                    <div style="font-size:36px;margin-bottom:8px">${['🏅','🥇','⭐','🔥','💡','🎓','🤝','🛡️'][i % 8]}</div>
+                    <div style="font-size:13px;font-weight:700">${S.escapeHtml(b)}</div>
+                    <div style="font-size:10px;color:var(--saas-muted);margin-top:4px">شارة إنجاز</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        } else if (activeTab === 'security') {
+          container.innerHTML = `
+            <div class="saas-card skeleton" style="height:200px;margin-bottom:20px"></div>
+            <div class="saas-card skeleton" style="height:300px"></div>
+          `;
+          const sec = await loadSecurity();
+          const history = sec.loginHistory || [];
+          container.innerHTML = `
+            <div class="security-alert">
+              <span style="font-size:28px">🔒</span>
+              <div>
+                <div style="font-weight:700;font-size:14px">بيانات الأمان والجهاز الخاصة بحسابك</div>
+                <div style="font-size:12px;color:var(--saas-muted);margin-top:2px">هذه المعلومات خاصة بك فقط. إذا رأيت نشاطاً غير مألوف تواصل مع الدعم فوراً.</div>
+              </div>
+            </div>
+
+            <div class="saas-card" style="margin-bottom:20px">
+              <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">📍 سجل تسجيل الدخول (آخر 10 دخولات)</h3>
+              ${history.length ? `
+                <div class="login-row header" style="padding:8px 16px">
+                  <span>الوقت</span>
+                  <span>عنوان IP</span>
+                  <span class="hide-mobile">الجهاز</span>
+                  <span class="hide-mobile">المتصفح</span>
+                  <span>نظام التشغيل</span>
+                </div>
+                ${history.map((l, i) => `
+                  <div class="login-row" style="${i === 0 ? 'background:rgba(16,185,129,0.04);border-radius:10px' : ''}">
+                    <div>
+                      <div style="font-size:13px;font-weight:${i===0?'700':'400'};color:${i===0?'var(--saas-text)':'var(--saas-muted)'}">${new Date(l.at || Date.now()).toLocaleString('ar-EG', {dateStyle:'short',timeStyle:'short'})}</div>
+                      ${i === 0 ? '<div style="font-size:10px;color:#10b981;margin-top:2px">● آخر دخول</div>' : ''}
+                    </div>
+                    <div style="font-family:monospace;font-size:13px;color:#d3a4ef">${S.escapeHtml(l.ip || '—')}</div>
+                    <div class="hide-mobile">${l.device === 'mobile' ? '📱 موبايل' : l.device === 'tablet' ? '📲 تابلت' : '🖥️ كمبيوتر'}</div>
+                    <div class="hide-mobile" style="font-size:12px">${S.escapeHtml(l.browser || '—')}</div>
+                    <div style="font-size:12px">${S.escapeHtml(l.os || '—')}</div>
+                  </div>
+                `).join('')}
+              ` : '<div style="padding:30px;text-align:center;color:var(--saas-muted)"><span style="font-size:32px">🔍</span><p style="margin:12px 0 0;font-size:14px">لم يتم تسجيل أي دخول سابق بعد.</p></div>'}
+            </div>
+
+            <div class="saas-card">
+              <h3 style="font-size:16px;font-weight:700;margin-bottom:14px">🛡️ نصائح أمان الحساب</h3>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+                ${[
+                  { icon: '🔑', title: 'كلمة مرور قوية', desc: 'استخدم كلمة مرور تحتوي على حروف وأرقام ورموز' },
+                  { icon: '📧', title: 'تفعيل البريد الإلكتروني', desc: 'تحقق من بريدك لحماية حسابك بشكل كامل', done: user.isEmailVerified },
+                  { icon: '🚫', title: 'تسجيل الخروج من الأجهزة', desc: 'تأكد من تسجيل الخروج من الأجهزة المشتركة' },
+                  { icon: '📱', title: 'التحقق بخطوتين (قريباً)', desc: 'ميزة أمان إضافية ستتوفر قريباً' },
+                ].map(tip => `
+                  <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.02);border:1px solid var(--saas-border)">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                      <span style="font-size:22px">${tip.icon}</span>
+                      <span style="font-size:13px;font-weight:700">${tip.title}</span>
+                      ${tip.done ? '<span style="color:#10b981;font-size:12px;margin-right:auto">✓ مفعّل</span>' : ''}
+                    </div>
+                    <p style="font-size:12px;color:var(--saas-muted);margin:0;line-height:1.5">${tip.desc}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      window.copyShareLink = function() {
+        if (!user) return;
+        const link = `${location.origin}/login-signup/profile.html?user=${encodeURIComponent(user.email)}`;
+        navigator.clipboard.writeText(link).then(() => {
+          S.toast("✅ تم نسخ رابط بروفايلك العام!", "success");
+        }).catch(() => prompt("رابط بروفايلك:", link));
+      };
+
+      window.openAvatarUpload = function() {
+        document.getElementById('avatarFileInput')?.click();
+      };
+
+      window.handleAvatarChange = async function() {
+        const file = document.getElementById('avatarFileInput').files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) { S.toast("الصورة كبيرة جداً (الحد الأقصى 2MB)", "error"); return; }
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const res = await S.api('/api/me/profile', { method: 'PUT', body: JSON.stringify({ avatar: e.target.result }) });
+            user = res.user || { ...user, avatar: e.target.result };
+            renderHeader();
+            S.toast("✅ تم تحديث الصورة الشخصية!", "success");
+          } catch (err) { S.toast("فشل تحديث الصورة", "error"); }
+        };
+        reader.readAsDataURL(file);
+      };
+
+      window.openEditModal = function() {
+        const u = user || {};
+        const overlay = document.createElement('div');
+        overlay.id = 'editProfileOverlay';
+        overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);";
+        overlay.innerHTML = `
+          <div style="background:var(--saas-surface-solid, #120c1e);border:1px solid var(--saas-border);border-radius:24px;padding:28px;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;direction:rtl;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
+            <h3 style="margin:0 0 24px;font-size:20px;font-weight:800">✏️ تعديل الملف الشخصي الكامل</h3>
+            <div style="display:flex;gap:12px;margin-bottom:14px">
+              <div style="flex:1">
+                <label style="display:block;font-size:12px;color:var(--saas-muted);margin-bottom:6px">الاسم الأول:</label>
+                <input id="editU1" class="saas-input" value="${S.escapeHtml(u.username1 || '')}" placeholder="أحمد">
+              </div>
+              <div style="flex:1">
+                <label style="display:block;font-size:12px;color:var(--saas-muted);margin-bottom:6px">الاسم الثاني:</label>
+                <input id="editU2" class="saas-input" value="${S.escapeHtml(u.username2 || '')}" placeholder="محمد">
+              </div>
+            </div>
+            <div style="margin-bottom:14px">
+              <label style="display:block;font-size:12px;color:var(--saas-muted);margin-bottom:6px">نبذة شخصية (Bio):</label>
+              <textarea id="editBio" class="saas-input" rows="3" placeholder="مطور ويب شغوف بالتعلم ومشاركة المعرفة...">${S.escapeHtml(u.bio || '')}</textarea>
+            </div>
+            <div style="margin-bottom:14px">
+              <label style="display:block;font-size:12px;color:var(--saas-muted);margin-bottom:6px">الدولة:</label>
+              <input id="editCountry" class="saas-input" value="${S.escapeHtml(u.country || 'مصر')}">
+            </div>
+            <div style="margin-bottom:14px">
+              <label style="display:block;font-size:12px;color:var(--saas-muted);margin-bottom:6px">الخبرة والمهارات التخصصية:</label>
+              <textarea id="editExp" class="saas-input" rows="4" placeholder="أعمل كمطور فول ستاك منذ 3 سنوات، متخصص في React وNode.js...">${S.escapeHtml(u.experience || '')}</textarea>
+            </div>
+            <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px">
+              <button class="saas-btn saas-btn-ghost" onclick="document.getElementById('editProfileOverlay').remove()">إلغاء</button>
+              <button class="saas-btn saas-btn-primary" id="saveEditBtn" onclick="saveProfileChanges(this)">حفظ التغييرات ✅</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+      };
+
+      window.saveProfileChanges = async function(btn) {
+        btn.disabled = true; btn.textContent = "⏳ جاري الحفظ...";
+        const username1 = document.getElementById('editU1').value.trim();
+        const username2 = document.getElementById('editU2').value.trim();
+        const bio = document.getElementById('editBio').value.trim();
+        const country = document.getElementById('editCountry').value.trim();
+        const experience = document.getElementById('editExp').value.trim();
+        try {
+          const res = await S.api('/api/me/profile', {
+            method: 'PUT',
+            body: JSON.stringify({ username1, username2, bio, country, experience })
+          });
+          user = res.user || user;
+          S.toast("✅ تم حفظ البيانات وتحديث البروفايل بنجاح!", "success");
+          document.getElementById('editProfileOverlay').remove();
+          renderHeader(); renderActiveTab();
+        } catch (err) {
+          S.toast(err.message || "حدث خطأ أثناء حفظ التعديلات", "error");
+          btn.disabled = false; btn.textContent = "حفظ التغييرات ✅";
+        }
+      };
+
+      const inp = document.createElement('input');
+      inp.id = 'avatarFileInput'; inp.type = 'file'; inp.accept = 'image/*'; inp.style.display = 'none';
+      inp.onchange = window.handleAvatarChange;
+      document.body.appendChild(inp);
+
+      var pc = document.getElementById("privacyCard");
+      if (pc) content.appendChild(pc);
+
+      loadProfile();
+    })();
+  </script>
+<!-- ─── منطقة الخصوصية والأمان (GDPR) ─── -->
+<div class="saas-card" id="privacyCard" style="max-width:760px;margin:28px auto;padding:26px">
+  <h2 style="font-size:18px;font-weight:800;margin:0 0 6px">🔐 الخصوصية وبياناتك</h2>
+  <p style="color:var(--saas-muted,#a89bc2);font-size:13.5px;line-height:1.8;margin:0 0 18px">
+    بياناتك ملكك. صدّر نسخة كاملة من كل ما حفظناه عنك في أي وقت، أو احذف حسابك وجميع بياناتك نهائياً.
+  </p>
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <button id="gdprExport" class="saas-btn saas-btn-primary" style="border-radius:999px">⬇️ تصدير بياناتي (JSON)</button>
+    <button id="gdprDelete" class="saas-btn saas-btn-ghost" style="border-radius:999px;color:#f87171;border-color:rgba(239,68,68,.35)">🗑️ حذف حسابي نهائياً</button>
+  </div>
+  <div id="gdprDeleteBox" style="display:none;margin-top:18px;padding:16px;border:1px solid rgba(239,68,68,.3);border-radius:14px;background:rgba(239,68,68,.06)">
+    <p style="margin:0 0 10px;font-size:13.5px;color:#fca5a5">⚠️ لا يمكن التراجع عن هذه الخطوة: ستُحذف رسائلك ومطابقاتك وملفك نهائياً. أكّد بكتابة كلمة المرور:</p>
+    <input id="gdprPw" type="password" placeholder="كلمة المرور" style="width:100%;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(203,166,247,.16);background:rgba(13,9,22,.55);color:var(--saas-text,#f5f1fb);margin-bottom:12px" />
+    <div style="display:flex;gap:10px">
+      <button id="gdprConfirm" style="padding:10px 22px;border-radius:999px;border:none;background:#ef4444;color:#fff;font-weight:800;cursor:pointer">تأكيد الحذف النهائي</button>
+      <button id="gdprCancel" style="padding:10px 22px;border-radius:999px;border:1px solid rgba(203,166,247,.3);background:transparent;color:var(--saas-text,#f5f1fb);font-weight:700;cursor:pointer">إلغاء</button>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  document.addEventListener("DOMContentLoaded", function () {
+    var exp = document.getElementById("gdprExport");
+    var del = document.getElementById("gdprDelete");
+    var box = document.getElementById("gdprDeleteBox");
+    if (exp) exp.addEventListener("click", function () {
+      var t = localStorage.getItem("token");
+      if (!t) { alert("سجّل الدخول أولاً"); return; }
+      fetch(apiUrl("/api/me/export"), { headers: { Authorization: "Bearer " + t } })
+        .then(function (r) { if (!r.ok) throw 0; return r.blob(); })
+        .then(function (b) {
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(b);
+          a.download = "sharik-my-data.json";
+          a.click();
+        })
+        .catch(function () { alert("تعذر التصدير الآن — حاول لاحقاً"); });
+    });
+    if (del) del.addEventListener("click", function () { box.style.display = box.style.display === "none" ? "block" : "none"; });
+    var cancel = document.getElementById("gdprCancel");
+    if (cancel) cancel.addEventListener("click", function () { box.style.display = "none"; });
+    var confirm = document.getElementById("gdprConfirm");
+    if (confirm) confirm.addEventListener("click", async function () {
+      var pw = document.getElementById("gdprPw").value;
+      if (!pw) { alert("اكتب كلمة المرور"); return; }
+      if (!(await SharikConfirm.show("هل أنت متأكد تماماً؟ سيُحذف كل شيء نهائياً."))) return;
+      fetch(apiUrl("/api/me"), {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("token") },
+        body: JSON.stringify({ password: pw })
+      }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          if (res.ok) {
+            localStorage.clear();
+            alert("تم حذف حسابك نهائياً. نأسف لرؤيتك تذهب 🖤");
+            window.location.href = "/index.html";
+          } else {
+            alert(res.j.error || "تعذر الحذف");
+          }
+        })
+        .catch(function () { alert("خطأ في الاتصال"); });
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

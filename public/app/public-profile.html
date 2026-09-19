@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الملف الشخصي العام | شارك</title>
+  <link rel="canonical" href="https://sharij-532a3.web.app/app/public-profile.html"><meta name="description" content="الملف الشخصي للمستخدِم والمشاركات والمهارات في منصة شارك." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/saas/saas.css" />
+<link rel="stylesheet" href="/tria-theme.css">
+  <script src="/config.js"></script>
+  <style>
+    .profile-hero {
+      background: var(--saas-surface);
+      border: 1px solid var(--saas-border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .profile-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #b57bee, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 800;
+      color: white;
+      border: 3px solid rgba(181,123,238,0.3);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-details { flex: 1; }
+    .profile-name { font-size: 24px; font-weight: 800; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; }
+    .profile-bio { color: var(--saas-muted); font-size: 14px; margin: 0 0 14px; line-height: 1.6; }
+    .skills-section { margin-bottom: 24px; }
+    .skills-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .skill-badge {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .skill-teach { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #10b981; }
+    .skill-learn { background: rgba(181,123,238,0.12); border: 1px solid rgba(181,123,238,0.3); color: #d3a4ef; }
+  </style>
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+<body class="dark saas-app">
+  <div id="saas-root"></div>
+  <script src="/saas/saas-shell.js"></script>
+  <script>
+    (async function () {
+      const S = window.SharikSaaS;
+      if (!S.requireAuth()) return;
+      const content = S.mountShell("profile");
+      if (!content) return;
+
+      const params = new URLSearchParams(location.search);
+      const targetEmail = params.get("email") || (S.getUser() ? S.getUser().email : "");
+
+      if (!targetEmail) {
+        content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--saas-muted)">لم يتم تحديد مستخدم</div>';
+        return;
+      }
+
+      content.innerHTML = `
+        <div style="text-align:center;padding:60px">
+          <div class="skeleton" style="width:80px;height:80px;border-radius:50%;margin:0 auto 16px"></div>
+          <p style="color:var(--saas-muted)">جاري تحميل الملف الشخصي...</p>
+        </div>
+      `;
+
+      try {
+        const data = await S.api("/api/user/" + encodeURIComponent(targetEmail));
+        const u = data.user || {};
+        const displayName = u.username1 || u.username || targetEmail.split("@")[0];
+        const initial = String(displayName).charAt(0).toUpperCase();
+
+        content.innerHTML = `
+          <div class="profile-hero">
+            <div class="profile-avatar">
+              ${u.avatar ? `<img src="${S.escapeHtml(u.avatar)}" alt="${S.escapeHtml(displayName)}">` : S.escapeHtml(initial)}
+            </div>
+            <div class="profile-details">
+              <h1 class="profile-name">
+                ${S.escapeHtml(displayName)}
+                ${u.status === 'active' ? '<span title="مفعل" style="color:#10b981;font-size:16px">✓</span>' : ''}
+              </h1>
+              <p class="profile-bio">${S.escapeHtml(u.bio || "عضو في منصة شارك لتبادل المهارات والتعلم التفاعلي.")}</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <a href="/login-signup/chat.html?email=${encodeURIComponent(targetEmail)}" class="saas-btn saas-btn-primary">💬 مراسلة</a>
+                <a href="/app/sessions.html?partner=${encodeURIComponent(targetEmail)}" class="saas-btn saas-btn-ghost">📅 حجز جلسة</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="saas-grid saas-grid-2">
+            <div class="saas-card skills-section">
+              <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">🌟 مهارات يتقنها ويُعلّمها:</h3>
+              <div class="skills-grid">
+                ${(u.teachSkills || []).length > 0
+                  ? u.teachSkills.map(s => `<span class="skill-badge skill-teach">🎓 ${S.escapeHtml(s)}</span>`).join('')
+                  : '<span style="color:var(--saas-muted);font-size:13px">لم يُضف مهارات تدريس بعد</span>'
+                }
+              </div>
+            </div>
+
+            <div class="saas-card skills-section">
+              <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">🎯 مهارات يرغب في تعلمها:</h3>
+              <div class="skills-grid">
+                ${(u.learnSkills || []).length > 0
+                  ? u.learnSkills.map(s => `<span class="skill-badge skill-learn">💡 ${S.escapeHtml(s)}</span>`).join('')
+                  : '<span style="color:var(--saas-muted);font-size:13px">لم يُضف مهارات تعلم بعد</span>'
+                }
+              </div>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--saas-muted)">عذراً، تعذر تحميل بيانات المستخدم.</div>';
+      }
+    })();
+  </script>
+</body>
+</html>

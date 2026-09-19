@@ -1,0 +1,17 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>نتائج المطابقة | منصة شارك</title><meta name="description" content="عرض نتائج المطابقة بين المستخدمين في منصة شارك بناءً على المهارات والاهتمامات."><meta name="robots" content="noindex, follow"><link rel="canonical" href="https://sharij-532a3.web.app/login-signup/matching-results.html"><meta property="og:type" content="website"><meta property="og:title" content="نتائج المطابقة | منصة شارك"><meta property="og:description" content="اكتشف نتائج المطابقة بين المستخدمين حسب المهارات."><meta property="og:url" content="https://sharij-532a3.web.app/login-signup/matching-results.html"><meta property="og:image" content="https://sharij-532a3.web.app/images/og-cover.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="نتائج المطابقة | شارك"><meta name="twitter:description" content="نتائج مطابقة المستخدمين داخل منصة شارك."><meta name="twitter:image" content="https://sharij-532a3.web.app/images/og-cover.jpg"><link rel="stylesheet" href="./main.css" /><link rel="stylesheet" href="../ui-system.css"><link rel="stylesheet" href="/saas/saas.css">
+<link rel="stylesheet" href="/tria-theme.css">  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head><body class="dark saas-app">
+<div id="saas-root"></div><script src="/saas/saas-shell.js?v=2" defer></script><script>
+(function () {
+  function boot() {
+    var S = window.SharikSaaS;
+    if (!S) return;
+    var content = S.mountShell("matching-results");
+    if (!content) return;
+    var main = document.querySelector("body > main");
+    if (main) content.appendChild(main);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();
+</script><main><div class="results-container"><div class="results-header"><h1> نتائج المطابقة</h1><p>وجدنا شركاء مناسبين لك بناءً على مهاراتك</p></div><div class="loading" id="loadingState" style="display: none"><div class="loading-spinner"></div><p>جاري البحث عن شركاء مناسبين...</p></div><div class="your-skills" id="yourSkills" style="display: none"><h3> مهاراتك</h3><div class="skills-row"><div class="skills-col"><h4><span class="svg-icon" data-icon="book" aria-hidden="true"></span> أريد تعلم:</h4><div id="learnSkillsList"></div></div><div class="skills-col"><h4><span class="svg-icon" data-icon="cap" aria-hidden="true"></span> أستطيع تعليم:</h4><div id="teachSkillsList"></div></div></div></div><div class="matches-section" id="matchesSection" style="display: none"><h2 class="matches-title"> الشركاء المتطابقون (<span id="matchCount">0</span>) </h2><div id="matchesList"></div></div><div class="no-matches" id="noMatches" style="display: none"><span class="emoji"><span class="svg-icon" data-icon="alert" aria-hidden="true"></span></span><h3>لا توجد مطابقات حالياً</h3><p> للأسف، لم نجد شركاء مناسبين الآن. حاول مرة أخرى لاحقاً أو أضف مهارات إضافية. </p><a href="skills-selection.html" class="btn-back"> تعديل المهارات</a></div></div><button type="button" id="btn" aria-label="العودة إلى أعلى الصفحة" title="العودة للأعلى" ><span class="svg-icon" data-icon="arrowUp" aria-hidden="true"></span></button></main><script src="/config.js"></script><script src="./matching-results.js"></script><script src="/auth.js" defer></script><script src="/icons.js" defer></script></body></html>

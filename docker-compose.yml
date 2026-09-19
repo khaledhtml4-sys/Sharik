@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./node-js كامل
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongo:27017/sharik
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=sharik_local_dev_secret_key_2026
+      - AI_PROVIDER=mock
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ./node-js كامل:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+volumes:
+  mongo-data:

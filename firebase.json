@@ -1,0 +1,139 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Frame-Options",
+            "value": "SAMEORIGIN"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "camera=(), microphone=(), geolocation=()"
+          }
+        ]
+      },
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=0, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(js|css|woff2|woff|ttf)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(avif|webp|png|jpg|jpeg|gif|svg|ico)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=2592000"
+          }
+        ]
+      },
+      {
+        "source": "/sitemap.xml",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml; charset=utf-8"
+          }
+        ]
+      },
+      {
+        "source": "/manifest.webmanifest",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400"
+          }
+        ]
+      },
+      {
+        "source": "/robots.txt",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain; charset=utf-8"
+          }
+        ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/about.html",
+        "destination": "/footer/About_Us.html",
+        "type": 301
+      },
+      {
+        "source": "/privacy.html",
+        "destination": "/footer/conditions.html",
+        "type": 301
+      },
+      {
+        "source": "/terms.html",
+        "destination": "/footer/Provisions.html",
+        "type": 301
+      },
+      {
+        "source": "/contact.html",
+        "destination": "/footer/Contact_us.html",
+        "type": 301
+      },
+      {
+        "source": "/faq.html",
+        "destination": "/footer/FAQ.html",
+        "type": 301
+      },
+      {
+        "source": "/help.html",
+        "destination": "/footer/help_center.html",
+        "type": 301
+      },
+      {
+        "source": "/login.html",
+        "destination": "/login-signup/login.html",
+        "type": 301
+      },
+      {
+        "source": "/signup.html",
+        "destination": "/login-signup/signup.html",
+        "type": 301
+      },
+      {
+        "source": "/skill-test.html",
+        "destination": "/login-signup/skill-test.html",
+        "type": 301
+      },
+      {
+        "source": "/choose-skills.html",
+        "destination": "/login-signup/skills-selection.html",
+        "type": 301
+      }
+    ]
+  }
+}

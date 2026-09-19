@@ -1,0 +1,21 @@
+{
+  "name": "شارك — تبادل المهارات",
+  "short_name": "شارك",
+  "description": "منصة عربية لتبادل المهارات والتعلم مع شركاء متوافقين",
+  "start_url": "/app/dashboard.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070b14",
+  "theme_color": "#0ea5e9",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

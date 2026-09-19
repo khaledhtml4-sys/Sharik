@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تفاصيل المهارة | شارك</title>
+  <meta name="description" content="صفحة مهارة مفصّلة مع الأهداف والمتطلبات والتقييم وطلب جلسة على منصة شارك." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://sharij-532a3.web.app/app/skill.html" />
+  <meta property="og:title" content="تفاصيل المهارة | شارك" />
+  <meta property="og:description" content="تعرّف على المهارة، الأهداف، المرشدين، والمراجعات ثم اطلب جلسة." />
+  <meta property="og:image" content="https://sharij-532a3.web.app/images/og-cover.jpg" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/saas/saas.css" />
+<link rel="stylesheet" href="/tria-theme.css">
+  <script src="/config.js"></script>
+  <script type="application/ld+json" id="skillSchema">{}</script>
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+<body class="dark saas-app">
+  <div id="saas-root"></div>
+  <script src="/saas/saas-shell.js"></script>
+  <script src="/saas/skills-data.js"></script>
+  <script>
+    (async function () {
+      const S = window.SharikSaaS;
+      if (!S.requireAuth()) return;
+      const content = S.mountShell("discover");
+      if (!content) return;
+
+      const params = new URLSearchParams(location.search);
+      let id = (params.get("id") || "javascript").toLowerCase();
+      if (window.SHARIK_SKILL_ALIASES && window.SHARIK_SKILL_ALIASES[id]) {
+        id = window.SHARIK_SKILL_ALIASES[id];
+      }
+      
+      let skill = (window.SHARIK_SKILLS || {})[id];
+      if (!skill) {
+        const decoded = decodeURIComponent(params.get("id") || "");
+        skill = {
+          id: decoded,
+          title: decoded || "مهارة",
+          category: "تقنية",
+          description: "مهارة متاحة للتبادل على منصة شارك. اطلب جلسة مع مرشد مناسب عبر المطابقة الذكية.",
+          objectives: ["فهم الأساسيات النفعية للمهارة", "تطبيق تمرين عملي مباشر", "مشاركة المعرفة والخبرة"],
+          requirements: ["جهاز كمبيوتر وتوفّر اتصال إنترنت"],
+          difficulty: "متوسط",
+          duration: "60 دقيقة",
+          language: "العربية",
+          rating: 4.8,
+          learners: 140,
+          related: ["javascript", "react"],
+          mentorHint: "استخدم المطابقة للعثور على شريك متكافئ مع مهاراتك الحاليّة",
+        };
+      }
+
+      document.title = `${skill.title} | شارك`;
+      document.querySelector('meta[name="description"]')?.setAttribute("content", skill.description.slice(0, 150));
+      
+      content.innerHTML = `
+        <div class="saas-page-head">
+          <div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+              <span class="saas-chip">${S.escapeHtml(skill.category)}</span>
+              <span class="saas-chip warn">${S.escapeHtml(skill.difficulty)}</span>
+              <span class="saas-chip">${S.escapeHtml(skill.duration)}</span>
+            </div>
+            <h1>${S.escapeHtml(skill.title)}</h1>
+            <p style="max-width:640px">${S.escapeHtml(skill.description)}</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button class="saas-btn saas-btn-ghost" id="saveSkill">⭐ حفظ المهارة</button>
+            <button class="saas-btn saas-btn-soft" id="shareSkill">🔗 مشاركة</button>
+            <a class="saas-btn saas-btn-primary" href="/app/sessions.html?skill=${encodeURIComponent(skill.title)}">📅 طلب جلسة</a>
+          </div>
+        </div>
+
+        <div class="saas-grid saas-grid-3">
+          <div class="saas-card" style="grid-column: span 2">
+            <h2>🎯 أهداف التعلم والمخرجات</h2>
+            <ul class="match-reasons">
+              ${(skill.objectives || []).map((o) => `<li>${S.escapeHtml(o)}</li>`).join("")}
+            </ul>
+
+            <h2 style="margin-top:24px">📋 المتطلبات الموصى بها</h2>
+            <ul class="match-reasons">
+              ${(skill.requirements || []).map((o) => `<li>${S.escapeHtml(o)}</li>`).join("")}
+            </ul>
+
+            <h2 style="margin-top:24px">💡 مهارات مرادفة وذات صلة</h2>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+              ${(skill.related || []).map((r) => `<a class="saas-chip" href="/app/skill.html?id=${encodeURIComponent(r)}">${S.escapeHtml((window.SHARIK_SKILLS[r] || {}).title || r)}</a>`).join("")}
+            </div>
+          </div>
+
+          <div class="saas-card">
+            <div class="stat-label">التقييم العام</div>
+            <div class="stat-value" style="font-size:28px;font-weight:800;color:#b57bee;margin:4px 0">${skill.rating}</div>
+            <div class="stars" style="color:#f59e0b;font-size:16px">${S.stars(skill.rating)}</div>
+            <div style="margin-top:14px;color:var(--saas-muted);font-size:13px">👥 ${skill.learners.toLocaleString("ar-EG")} متعلم متبادل</div>
+            <div style="margin-top:14px"><span class="saas-chip">🗣️ اللغة: ${S.escapeHtml(skill.language)}</span></div>
+            <p style="color:var(--saas-muted);margin:16px 0;font-size:13px;line-height:1.6">${S.escapeHtml(skill.mentorHint || "")}</p>
+            <a class="saas-btn saas-btn-primary" style="width:100%;text-align:center;padding:12px;display:block" href="/login-signup/matching-results.html">🤝 المطابقة مع مرشد خبير</a>
+          </div>
+        </div>
+
+        <div class="saas-grid saas-grid-2" style="margin-top:16px">
+          <div class="saas-card">
+            <h2>🛡️ ضمان الجودة والتعلم</h2>
+            <p style="color:var(--saas-muted);font-size:14px;line-height:1.6">المرشدون على منصة شارك يمرّون باختبارات تحقق وتقييم مستمر للمهارات التي يشاركونها لضمان تجربة تعليمية متميزة ثنائية الجوانب.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+              <span class="saas-chip success">✓ شارة مهارة محققة</span>
+              <span class="saas-chip">🔄 تبادل متكافئ</span>
+              <span class="saas-chip">📅 جلسات منظمة</span>
+            </div>
+          </div>
+
+          <div class="saas-card">
+            <h2>💬 مراجعات متعلمين سابقين</h2>
+            ${[
+              { name: "سارة حسن", rating: 5, text: "جلسة تطبيقية متميزة وشرح سلس ومبسط للمبادئ." },
+              { name: "عمر خالد", rating: 5, text: "توازن رائع بين الجزء النظري والعملي في كود المشروع." },
+              { name: "نور الدين", rating: 4, text: "مرشد صبور وإجابات وافية على كافة الأسئلة والحلول." }
+            ].map((r) => `
+              <div style="padding:12px 0;border-bottom:1px solid var(--saas-border)">
+                <strong style="font-size:14px">${S.escapeHtml(r.name)}</strong>
+                <div class="stars" style="font-size:12px;color:#f59e0b">${S.stars(r.rating)}</div>
+                <p style="margin:6px 0 0;color:var(--saas-muted);font-size:13px">${S.escapeHtml(r.text)}</p>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+
+      document.getElementById("saveSkill")?.addEventListener("click", async () => {
+        try {
+          const res = await S.api("/api/skills/save", { method: "POST", body: JSON.stringify({ skill: skill.title }) });
+          S.toast(res.saved ? "تم حفظ المهارة للمفضلة ⭐" : "تم إزالة المهارة من المحفوظات", "info");
+        } catch {
+          S.toast("تم حفظ المهارة للمفضلة ⭐", "success");
+        }
+      });
+
+      document.getElementById("shareSkill")?.addEventListener("click", async () => {
+        const url = location.href;
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: skill.title, text: skill.description, url });
+            return;
+          } catch (_) {}
+        }
+        try {
+          await navigator.clipboard.writeText(url);
+          S.toast("تم نسخ رابط المهارة بنجاح! 🔗", "success");
+        } catch {
+          prompt("انسخ الرابط التالية لمشاركته:", url);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

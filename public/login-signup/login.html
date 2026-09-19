@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تسجيل الدخول | منصة شارك لتبادل المهارات</title>
+  <meta name="robots" content="noindex, follow"><meta name="description" content="تسجيل الدخول إلى حسابك في منصة شارك لتبادل المهارات والتطوير الشخصي." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./main.css" />
+  <link rel="stylesheet" href="../ui-system.css" />
+  <link rel="stylesheet" href="/unified-header.css" />
+  <link rel="stylesheet" href="/tria-theme.css" />
+  <link rel="stylesheet" href="/auth-theme.css" />
+  <style>
+    .split-auth-wrap {
+      min-height: calc(100vh - 72px);
+      margin-top: 72px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #0d0916;
+    }
+    .auth-form-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 24px;
+      position: relative;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(18, 28, 48, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 24px;
+      padding: 36px 30px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    .auth-hero-side {
+      background: linear-gradient(135deg, #120c1e 0%, #2a1a45 50%, #0d0916 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px;
+      position: relative;
+      overflow: hidden;
+      border-inline-start: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .auth-hero-side::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.25), transparent 60%),
+                  radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.2), transparent 50%);
+    }
+    .auth-input-group {
+      margin-bottom: 20px;
+    }
+    .auth-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+    .auth-input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #f8fafc;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .auth-input:focus {
+      border-color: #b57bee;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      background: rgba(15, 23, 42, 0.9);
+    }
+    .auth-submit-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #b57bee, #8b5cf6);
+      color: white;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .auth-submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(59, 130, 246, 0.45);
+    }
+    .expired-banner {
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    @media (max-width: 900px) {
+      .split-auth-wrap { grid-template-columns: 1fr; }
+      .auth-hero-side { display: none; }
+    }
+  </style>
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+<body class="dark">
+  <header id="header">
+    <div class="logo">
+      <a href="/index.html"><img class="logo-img" src="/images/logo.svg" alt="شارك" width="195" height="52" decoding="async"></a>
+    </div>
+    <button class="menu-icon" id="menuBtn" aria-label="القائمة" aria-expanded="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <nav class="nav" id="mainNav">
+      <a href="/index.html">الرئيسية</a>
+      <a href="/work/work.html">كيف تعمل المنصة</a>
+      <a href="/blogs/blogs.html">المدونة</a>
+      <a href="/Matching/matching.html">المطابقة</a>
+    </nav>
+    <div class="header-actions">
+      <a href="/login-signup/signup.html"><button class="btn-login">إنشاء حساب جديد</button></a>
+      <div class="theme-switcher">
+        <button id="themeBtn" aria-label="تغيير الوضع">🌙</button>
+      </div>
+    </div>
+  </header>
+  <script src="/unified-header.js?v=2" defer></script>
+
+  <main class="split-auth-wrap">
+    <div class="auth-form-side">
+      <div class="auth-card">
+        <div style="text-align:center;margin-bottom:28px">
+          <h2 style="font-size:26px;font-weight:900;margin:0 0 8px;color:#f8fafc" data-i18n="au.login.t">مرحباً بعودتك! 👋</h2>
+          <p style="color:#94a3b8;font-size:14px;margin:0" data-i18n="au.login.s">قم بتسجيل الدخول للاستمرار في تبادل المهارات</p>
+        </div>
+
+        <div id="expiredAlert" class="expired-banner" style="display:none">
+          <span>⚠️</span>
+          <span data-i18n="au.expired">انتهت صلاحية الجلسة السابقة. يرجى تسجيل الدخول مجدداً.</span>
+        </div>
+
+        <form class="login-form">
+          <div class="auth-input-group">
+            <label for="inputEmail1" class="auth-label" data-i18n="au.email">البريد الإلكتروني:</label>
+            <input id="inputEmail1" type="email" name="email" class="auth-input" placeholder="name@example.com" required autocomplete="email" />
+          </div>
+
+          <div class="auth-input-group">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <label for="inputPassword1" class="auth-label" style="margin:0" data-i18n="au.password">كلمة المرور:</label>
+              <a href="#" onclick="document.getElementById('forgotModal').style.display='flex'; return false;" style="color:#d3a4ef;font-size:12px;text-decoration:none" data-i18n="au.forgot">نسيت كلمة المرور؟</a>
+            </div>
+            <input type="password" id="inputPassword1" name="password" class="auth-input" maxlength="40" placeholder="••••••••" required autocomplete="current-password" />
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px;font-size:13px;color:#94a3b8">
+            <input type="checkbox" id="showPw" onchange="document.getElementById('inputPassword1').type = this.checked ? 'text' : 'password'" style="accent-color:#b57bee;cursor:pointer">
+            <label for="showPw" style="cursor:pointer" data-i18n="au.show">إظهار كلمة المرور</label>
+          </div>
+
+          <button type="submit" class="auth-submit-btn" id="inputSubmit" data-i18n="au.submit">تسجيل الدخول 🚀</button>
+
+          <div style="text-align:center;margin-top:24px;font-size:14px;color:#94a3b8">
+            <span data-i18n="au.noacc">ليس لديك حساب بعد؟</span> <a href="signup.html" style="color:#d3a4ef;font-weight:700;text-decoration:none" data-i18n="au.create">قم بإنشاء حساب جديد</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="auth-hero-side">
+      <div style="position:relative;z-index:2;max-width:500px">
+        <div style="display:inline-block;padding:6px 16px;border-radius:999px;background:rgba(181,123,238,0.15);border:1px solid rgba(181,123,238,0.3);color:#d3a4ef;font-size:12px;font-weight:800;margin-bottom:20px">
+          <span data-i18n="au.login.badge">💡 أكبر مجتمع تبادل مهارات تقنية</span>
+        </div>
+        <h1 style="font-size:36px;font-weight:900;line-height:1.3;margin:0 0 16px;color:white">
+          <span data-i18n="au.login.hero.h">تعلّم مهارات جديدة مجاناً مقابل ما تتقنه</span>
+        </h1>
+        <p style="color:#94a3b8;font-size:16px;line-height:1.7;margin-bottom:32px">
+          <span data-i18n="au.login.hero.p">انضم لأكثر من 10,000+ مطور ومصمم ومتخصص يتبادلون الخبرات البرمجية والتقنية في مصر والوطن العربي بأسلوب سلس ومباشر.</span>
+        </p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div style="padding:16px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08)">
+            <div style="font-size:24px;margin-bottom:6px">⚡</div>
+            <strong style="color:white;font-size:14px;display:block" data-i18n="au.login.c1">مطابقة ذكية فورية</strong>
+            <span style="font-size:12px;color:#94a3b8" data-i18n="au.login.c1s">خوارزميات تطابق مهاراتك بدقة</span>
+          </div>
+          <div style="padding:16px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08)">
+            <div style="font-size:24px;margin-bottom:6px">📹</div>
+            <strong style="color:white;font-size:14px;display:block" data-i18n="au.login.c2">محرر كود وبث مباشر</strong>
+            <span style="font-size:12px;color:#94a3b8" data-i18n="au.login.c2s">محادثة تفاعلية وسريعة</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="schedule-modal" id="forgotModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center; backdrop-filter:blur(6px);">
+    <div style="background:#120c1e; border:1px solid rgba(203,166,247,0.2); padding:28px; border-radius:20px; width:90%; max-width:420px; box-shadow:0 20px 50px rgba(0,0,0,0.6); direction:rtl;">
+      <h3 style="margin-top:0; color:white; display:flex; align-items:center; gap:8px;" data-i18n="au.forgot.t">🔑 استعادة كلمة المرور</h3>
+      <p style="color:#94a3b8; font-size:14px; margin-bottom:20px;" data-i18n="au.forgot.p">أدخل البريد الإلكتروني الخاص بك وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.</p>
+      <div style="margin-bottom:20px;">
+        <label style="display:block; margin-bottom:6px; font-weight:bold; color:#94a3b8; font-size:12px;" data-i18n="au.email">البريد الإلكتروني:</label>
+        <input type="email" id="forgotEmail" class="auth-input" placeholder="example@domain.com">
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button onclick="document.getElementById('forgotModal').style.display='none'" style="padding:10px 20px; border:none; background:rgba(255,255,255,0.08); color:white; border-radius:10px; cursor:pointer; font-weight:bold; font-family:inherit;" data-i18n="au.cancel">إلغاء</button>
+        <button type="button" onclick="submitForgotPassword()" style="padding:10px 20px; border:none; background:#b57bee; color:#fff; border-radius:10px; cursor:pointer; font-weight:bold; font-family:inherit;" data-i18n="au.send">إرسال الرابط ✅</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/config.js?v=20260725"></script>
+  <script src="./login.js?v=20260725"></script>
+  <script>
+    if (new URLSearchParams(window.location.search).get('expired') === '1') {
+      document.getElementById('expiredAlert').style.display = 'flex';
+    }
+  </script>
+  <script src="/auth.js" defer></script>
+  <script src="/icons.js" defer></script>
+</body>
+</html>

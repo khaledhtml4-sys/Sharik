@@ -1,0 +1,279 @@
+﻿<!doctype html>
+<html lang="ar" dir="rtl">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO -->
+
+  <title>إنشاء حساب مجاني | منصة شارك لتبادل المهارات</title>
+
+<meta name="description"
+ content="أنشئ حسابك مجانًا على منصة شارك وابدأ في تبادل المهارات وتعلم مهارات جديدة بسهولة مع مستخدمين من مصر والعالم العربي.">
+
+<meta name="keywords"
+ content="إنشاء حساب شارك, تسجيل مجاني, skill exchange signup, تعلم مجانا, منصة تعليم مصر">
+
+  <meta name="author" content="Sharik">
+  <meta name="robots" content="index, follow">
+
+  <!-- Canonical -->
+
+  <link rel="canonical" href="https://sharij-532a3.web.app/login-signup/signup.html"><meta name="robots" content="noindex, nofollow">
+
+  <!-- Open Graph -->
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sharij-532a3.web.app/login-signup/signup.html">
+  <meta property="og:title" content="إنشاء حساب مجاني | منصة شارك">
+  <meta property="og:description"
+    content="سجل الآن وابدأ في تعلم أو تعليم المهارات مجانًا.">
+  <meta property="og:image" content="https://sharij-532a3.web.app/images/og-cover.jpg">
+
+  <!-- Twitter -->
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="إنشاء حساب | شارك">
+  <meta name="twitter:description" content="انضم الآن إلى منصة تبادل المهارات.">
+  <meta name="twitter:image" content="https://sharij-532a3.web.app/images/og-cover.jpg">
+
+  <!-- Fonts -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Syne:wght@700&display=swap"
+    rel="stylesheet">
+
+  <!-- CSS -->
+
+  <link rel="stylesheet" href="./main.css">
+  <link rel="stylesheet" href="./ui-system.css">
+
+  <!-- Icons -->
+<!-- Structured Data -->
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "إنشاء حساب",
+    "description": "صفحة تسجيل حساب جديد في منصة شارك",
+    "url": "https://sharij-532a3.web.app/login-signup/signup.html"
+  }
+  </script>
+
+  <link rel="stylesheet" href="./unified-header.css" />
+  <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
+</head>
+
+  <body class="dark">
+    
+    <header id="header">
+    <div class="logo">
+      <a href="./index.html"><img class="logo-img" src="./images/logo.svg" alt="شارك" decoding="async"></a>
+    </div>
+    <button class="menu-icon" id="menuBtn" aria-label="القائمة">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+    <nav class="nav" id="mainNav">
+      <a href="./index.html">Home</a>
+      <a href="./work/work.html">How it works</a>
+      <a href="./blogs/blogs.html">Blog</a>
+      <a href="./Matching/matching.html">Matching</a>
+    </nav>
+
+    <div class="header-actions">
+      <a href="./login-signup/signup.html"><button class="btn-login">انشاء حساب</button></a>
+
+      <div class="theme-switcher">
+        <button id="themeBtn" aria-label="تغيير الوضع">🌙</button>
+        <div class="theme-menu" id="themeMenu">
+          <button onclick="applyTheme('light')"><span style="margin-left: 8px;">☀️</span> فاتح</button>
+          <button onclick="applyTheme('dark')"><span style="margin-left: 8px;">🌙</span> داكن</button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <script src="./unified-header.js?v=2"></script>
+
+    <main>
+      <div class="signup-container">
+        <h3 class="signup-title">إنشاء حساب جديد</h3>
+
+        <form id="signupForm"  method="post" action="/signup.html">
+          <div class="signup-form">
+            <label for="inputName" class="form-label">الإسم</label>
+            <input
+              id="inputName"
+              class="form-input"
+              type="text"
+              required
+              placeholder="Khaled"
+              autocomplete="username"
+              name="username1"
+            />
+            <label for="inputName" class="form-label">إسم العائلة</label>
+            <input
+              id="inputName2"
+              class="form-input"
+              type="text"
+              required
+              placeholder="Refaat"
+              autocomplete="username"
+              name="username2"
+            />
+
+            <label for="inputEmail" class="form-label">البريد الإلكتروني</label>
+            <input
+              id="inputEmail"
+              class="form-input"
+              type="email"
+              placeholder="example@gmail.com"
+              required
+              autocomplete="email"
+              name="email"
+            />
+
+            <label for="inputPassword" class="form-label">كلمة المرور</label>
+            <input
+              class="form-input"
+              type="password"
+              placeholder="••••••"
+              id="inputPassword"
+              required
+              autocomplete="new-password"
+              name="password"
+            />
+            <div class="show-password">
+              <input
+              name="checkbox"
+                type="checkbox"
+                id="showPw"
+                onchange="
+                  document.getElementById('inputPassword').type = this.checked
+                    ? 'text'
+                    : 'password'
+                "
+              />
+              <label for="showPw">إظهار كلمة المرور</label>
+            </div>
+          </div>
+
+          <div class="terms-section">
+            <input
+              id="inputCheckbox"
+              name="checkbox"
+              type="checkbox"
+              required
+            />
+            <label for="inputCheckbox">
+              أوافق على
+              <a href="#" class="terms-link">الشروط والأحكام</a>
+              و<a href="#" class="terms-link">سياسة الخصوصية</a>
+            </label>
+          </div>
+
+          <button id="inputSubmit" class="signup-button" type="submit">
+            إنشاء حساب
+          </button>
+
+          <div class="auth-divider">أو</div>
+
+          <p class="login-text">
+            لديك حساب بالفعل؟
+            <a href="/login-signup/login.html" class="login-link">تسجيل الدخول</a>
+          </p>
+        </form>
+      </div>
+      <button
+        type="button"
+        id="btn"
+        aria-label="العودة إلى أعلى الصفحة"
+        title="العودة للأعلى"
+      >
+        <span class="svg-icon" data-icon="arrowUp" aria-hidden="true"></span>
+      </button>
+    </main>
+
+    
+    <footer class="footer" role="contentinfo">
+      <div class="footer-top">
+        <div class="footer-social-title">Social Media</div>
+
+       <div class="footer-social-icons">
+        <a href="#" aria-label="Facebook">  <svg width="25" height="25" viewBox="0 0 24 24">
+    <path d="M14 9H16V6H14C11.79 6 10 7.79 10 10V12H8V15H10V21H13V15H15L16 12H13V10C13 9.45 13.45 9 14 9Z"
+      fill="currentColor"/>
+  </svg>
+</a>
+        <a href="#">  <svg width="25" height="25" viewBox="0 0 24 24">
+    <path d="M22 5.92C21.26 6.26 20.46 6.5 19.63 6.6C20.48 6.09 21.13 5.28 21.44 4.31C20.64 4.78 19.75 5.12 18.8 5.3C18.04 4.5 16.96 4 15.77 4C13.42 4 11.54 5.88 11.54 8.23C11.54 8.56 11.57 8.88 11.64 9.18C8.09 9 4.93 7.38 2.72 4.96C2.36 5.57 2.16 6.27 2.16 7.01C2.16 8.42 2.89 9.66 3.97 10.39C3.3 10.37 2.68 10.19 2.13 9.89V9.95C2.13 11.97 3.57 13.66 5.44 14.03C5.11 14.12 4.75 14.17 4.39 14.17C4.13 14.17 3.87 14.15 3.63 14.1C4.14 15.74 5.68 16.94 7.49 16.98C6.07 18.1 4.27 18.78 2.31 18.78C1.87 18.78 1.44 18.76 1 18.7C2.83 19.86 5.01 20.54 7.36 20.54C15.76 20.54 20.54 13.56 20.54 7.53C20.54 7.32 20.54 7.11 20.53 6.9C21.34 6.34 22.05 5.64 22.62 4.84L22 5.92Z"
+      fill="currentColor"/>
+  </svg></a>
+        <a href="#">  <svg width="25" height="25" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 10.2v3.6h5.1c-.2 1.2-1.4 3.6-5.1 3.6-3.1 0-5.6-2.6-5.6-5.8s2.5-5.8 5.6-5.8c1.8 0 3 .8 3.7 1.5l2.5-2.4C16.8 3.5 14.6 2.6 12 2.6 6.9 2.6 2.8 6.7 2.8 11.8S6.9 21 12 21c6.9 0 8.6-4.8 8.6-7.3 0-.5 0-.9-.1-1.3H12z"/>
+  </svg></a>
+
+        <a href="#"> <svg width="25" height="25" viewBox="0 0 24 24">
+    <rect x="3" y="3" width="18" height="18" rx="5"
+      stroke="currentColor" stroke-width="2"/>
+    
+    <circle cx="12" cy="12" r="4"
+      stroke="currentColor" stroke-width="2"/>
+
+    <circle cx="17.5" cy="6.5" r="1.2"
+      fill="currentColor"/>
+  </svg></a>
+        <a href="#"><svg width="25" height="25" viewBox="0 0 24 24">
+    <rect x="3" y="3" width="18" height="18" rx="3"
+      stroke="currentColor" stroke-width="2"/>
+
+    <path d="M7 10V17"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+
+    <circle cx="7" cy="7" r="1" fill="currentColor"/>
+
+    <path d="M11 17V12C11 10.5 12 9.5 13.5 9.5C15 9.5 16 10.5 16 12V17"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </svg></a>
+        <a href="#">  <svg width="25" height="25" viewBox="0 0 24 24">
+    <path d="M12 2C6.48 2 2 6.58 2 12.26C2 16.8 4.87 20.66 8.84 21.99C9.34 22.09 9.52 21.77 9.52 21.5C9.52 21.26 9.51 20.62 9.51 19.86C6.73 20.52 6.14 18.66 6.14 18.66C5.68 17.43 5.03 17.12 5.03 17.12C4.12 16.48 5.1 16.5 5.1 16.5C6.12 16.58 6.65 17.57 6.65 17.57C7.54 19.15 8.97 18.71 9.54 18.46C9.64 17.78 9.89 17.31 10.16 17.05C7.95 16.79 5.62 15.94 5.62 12.26C5.62 11.2 6 10.34 6.66 9.66C6.56 9.4 6.22 8.32 6.76 6.86C6.76 6.86 7.6 6.58 9.5 7.9C10.28 7.67 11.12 7.56 11.96 7.56C12.8 7.56 13.64 7.67 14.42 7.9C16.32 6.58 17.16 6.86 17.16 6.86C17.7 8.32 17.36 9.4 17.26 9.66C17.92 10.34 18.3 11.2 18.3 12.26C18.3 15.95 15.96 16.78 13.74 17.04C14.11 17.38 14.44 18.05 14.44 19.06C14.44 20.51 14.43 21.2 14.43 21.5C14.43 21.77 14.61 22.1 15.12 21.99C19.09 20.66 21.96 16.8 21.96 12.26C21.96 6.58 17.52 2 12 2Z"
+      fill="currentColor"/>
+  </svg></a>
+      </div>
+      </div>
+
+      <div class="footer-content">
+        <div class="footer-column">
+          <h6>Contact</h6>
+          <p><span class="svg-icon" data-icon="home" aria-hidden="true"></span> Cairo, Al-Giza</p>
+          <p><span class="svg-icon" data-icon="mail" aria-hidden="true"></span> Sharik@gmail.com</p>
+          <p><span class="svg-icon" data-icon="phone" aria-hidden="true"></span> 01283931083</p>
+          <p><span class="svg-icon" data-icon="printer" aria-hidden="true"></span> 01006843165</p>
+        </div>
+
+        <div class="footer-column">
+          <h6>Site Menu</h6>
+          <a href="/footer/FAQ.html">FAQ</a>
+          <a href="/blogs/blogs.html">Blog</a>
+          <a href="/work/work.html">How It Works</a>
+          <a href="/footer/help_center.html">Help Center</a>
+        </div>
+        <div class="footer-column">
+          <h6>Resources</h6>
+          <a href="/footer/Contact_us.html">Contact Us</a>
+          <a href="/footer/About_Us.html">About</a>
+          <a href="/footer/Provisions.html">Terms of Service</a>
+          <a href="footer/conditions.html">Privacy Policy</a>
+        </div>
+      </div>
+      <div class="footer-bottom">© 2026 Copyright: Sharik</div>
+    </footer>
+
+    <script src="/js/all.min.js"></script>
+    <script src="./signup.js"></script>
+  <script src="/auth.js" defer></script>
+  <script src="./icons.js" defer></script>
+</body>
+</html>
