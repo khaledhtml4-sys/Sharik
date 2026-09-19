@@ -33,6 +33,9 @@
       <button class="nav-item" data-section="reports"><span class="nav-icon">🚩</span><span class="nav-label">الشكاوى</span><span class="nav-badge danger" id="openReportsBadge">0</span></button>
       <button class="nav-item" data-section="notifications"><span class="nav-icon">📣</span><span class="nav-label">الإشعارات</span></button>
       <button class="nav-item" data-section="audit"><span class="nav-icon">📋</span><span class="nav-label">سجل الأحداث</span></button>
+      <button class="nav-item" data-section="messages"><span class="nav-icon">💬</span><span class="nav-label">الرسائل</span></button>
+      <button class="nav-item" data-section="sessions"><span class="nav-icon">📅</span><span class="nav-label">المواعيد والجلسات</span></button>
+      <button class="nav-item" data-section="activity"><span class="nav-icon">📊</span><span class="nav-label">نشاط الزوار</span></button>
       <div class="nav-separator"></div>
       <button class="nav-item danger-item" id="logoutBtn"><span class="nav-icon">🚪</span><span class="nav-label">تسجيل الخروج</span></button>
     </nav>
@@ -187,6 +190,42 @@
       </div>
     </section>
 
+
+    <section class="section" id="section-messages" data-title="الرسائل">
+      <div class="toolbar"><span class="meta-label" id="messagesMeta">—</span><span class="meta-label">أحدث 200 رسالة — للمراقبة والتنظيم</span></div>
+      <div class="card table-card"><div class="table-scroll"><table>
+        <thead><tr><th>الوقت</th><th>المرسل</th><th>المستقبل</th><th>الرسالة</th><th>إجراء</th></tr></thead>
+        <tbody id="messagesTable"><tr><td colspan="5" class="loading-cell">جاري التحميل...</td></tr></tbody>
+      </table></div></div>
+    </section>
+
+    <section class="section" id="section-sessions" data-title="المواعيد والجلسات">
+      <div class="kpi-grid sessions-kpis">
+        <div class="kpi-card"><div class="kpi-icon">📅</div><div class="kpi-value" id="sessionsTotal">0</div><div class="kpi-label">إجمالي الجلسات</div></div>
+        <div class="kpi-card"><div class="kpi-icon">⏳</div><div class="kpi-value" id="sessionsUpcoming">0</div><div class="kpi-label">قادمة</div></div>
+        <div class="kpi-card"><div class="kpi-icon">✔️</div><div class="kpi-value" id="sessionsPast">0</div><div class="kpi-label">منتهية</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🚫</div><div class="kpi-value" id="sessionsCancelled">0</div><div class="kpi-label">ملغاة</div></div>
+      </div>
+      <div class="card table-card"><div class="table-scroll"><table>
+        <thead><tr><th>الجلسة</th><th>المضيف</th><th>الضيف</th><th>الموعد</th><th>المدة</th><th>الحالة</th></tr></thead>
+        <tbody id="sessionsTable"><tr><td colspan="6" class="loading-cell">جاري التحميل...</td></tr></tbody>
+      </table></div></div>
+    </section>
+
+    <section class="section" id="section-activity" data-title="نشاط الزوار">
+      <div class="kpi-grid activity-kpis">
+        <div class="kpi-card"><div class="kpi-icon">👁️</div><div class="kpi-value" id="actToday">0</div><div class="kpi-label">زيارات اليوم</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📈</div><div class="kpi-value" id="actWeek">0</div><div class="kpi-label">زيارات الأسبوع</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🧑‍💻</div><div class="kpi-value" id="actUnique">0</div><div class="kpi-label">أعضاء سجلوا دخولهم اليوم</div></div>
+      </div>
+      <div class="card"><div class="card-head"><h2>📄 أكثر الصفحات زيارة (آخر 14 يوم)</h2></div><div id="topPathsList" class="rank-list"><p class="muted-text">جاري التحميل...</p></div></div>
+      <div class="card"><div class="card-head"><h2>📊 الزيارات اليومية (آخر 14 يوم)</h2></div><div id="dailyBars" class="daily-bars"><p class="muted-text">جاري التحميل...</p></div></div>
+      <div class="card table-card"><div class="card-head"><h2>🕒 أحدث الزيارات</h2></div><div class="table-scroll"><table>
+        <thead><tr><th>الوقت</th><th>المستخدم</th><th>الصفحة</th><th>قادم من</th></tr></thead>
+        <tbody id="activityTable"><tr><td colspan="4" class="loading-cell">جاري التحميل...</td></tr></tbody>
+      </table></div></div>
+    </section>
+
   </main>
 </div>
 
@@ -217,6 +256,6 @@
 </div>
 
 <div id="toastContainer" class="toast-container"></div>
-<script src="dashboard.js?v=20260726"></script>
+<script src="dashboard.js?v=20260919"></script>
 </body>
 </html>

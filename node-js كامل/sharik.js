@@ -5103,6 +5103,104 @@ app.put("/api/notification-preferences", authMiddleware, async (req, res) => {
 // ═══════════════════════════════════════════════
 // API VERSION HEADERS
 // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// 📊 ADMIN ANALYTICS — تتبع الزيارات + الرسائل + المواعيد
+// ═══════════════════════════════════════════════
+const Pageview = mongoose.models.Pageview || mongoose.model("Pageview", new mongoose.Schema({
+  u: { type: String, default: null },
+  p: { type: String, default: "/" },
+  r: { type: String, default: "" },
+  t: { type: Date, default: Date.now }
+}, { collection: "pageviews" }));
+
+// Beacon خفيف عام — يسجل زيارة الصفحة (toast.js يرسله من كل صفحة)
+app.post("/api/track", async (req, res) => {
+  try {
+    let uid = null;
+    try {
+      const auth = req.headers.authorization || "";
+      if (auth.startsWith("Bearer ")) uid = String(jwt.verify(auth.slice(7), JWT_SECRET).id || "");
+    } catch (_) {}
+    const p = String((req.body && req.body.p) || "/").slice(0, 200);
+    if (p.indexOf("/admin") !== 0) {
+      await Pageview.create({ u: uid, p, r: String((req.body && req.body.r) || "").slice(0, 200) });
+    }
+    res.json({ ok: true });
+  } catch (_) { res.json({ ok: true }); }
+});
+
+// Admin: تحليلات الزيارات — بيدخل على إيه
+app.get("/api/admin/activity", async (req, res) => {
+  try {
+    const now = Date.now();
+    const dayStart = new Date(now - 24 * 3600 * 1000);
+    const weekStart = new Date(now - 7 * 24 * 3600 * 1000);
+    const since14 = new Date(now - 14 * 24 * 3600 * 1000);
+    const [today, week, uniqToday, topPaths, daily, recent] = await Promise.all([
+      Pageview.countDocuments({ t: { $gte: dayStart } }),
+      Pageview.countDocuments({ t: { $gte: weekStart } }),
+      Pageview.distinct("u", { t: { $gte: dayStart }, u: { $ne: null } }),
+      Pageview.aggregate([
+        { $match: { t: { $gte: since14 } } },
+        { $group: { _id: "$p", count: { $sum: 1 } } },
+        { $sort: { count: -1 } }, { $limit: 12 }
+      ]),
+      Pageview.aggregate([
+        { $match: { t: { $gte: since14 } } },
+        { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$t" } }, count: { $sum: 1 } } },
+        { $sort: { _id: 1 } }
+      ]),
+      Pageview.aggregate([
+        { $sort: { t: -1 } }, { $limit: 120 },
+        { $lookup: { from: "users", localField: "u", foreignField: "_id", as: "user" } },
+        { $project: { p: 1, t: 1, r: 1, email: { $ifNull: [{ $arrayElemAt: ["$user.email", 0] }, null] } } }
+      ])
+    ]);
+    res.json({ today, week, uniqueToday: uniqToday.length, topPaths, daily, recent });
+  } catch (e) { res.status(500).json({ error: "خطأ في جلب النشاط" }); }
+});
+
+// Admin: كل المواعيد/الجلسات المحجوزة
+app.get("/api/admin/sessions", async (req, res) => {
+  try {
+    const sessions = await Session.find({}).sort({ startAt: -1 }).limit(300).lean();
+    const now = new Date();
+    const counts = {
+      total: sessions.length,
+      upcoming: sessions.filter(s => new Date(s.startAt) >= now && s.status !== "cancelled").length,
+      past: sessions.filter(s => new Date(s.startAt) < now && s.status !== "cancelled").length,
+      cancelled: sessions.filter(s => s.status === "cancelled").length
+    };
+    res.json({ sessions, counts });
+  } catch (e) { res.status(500).json({ error: "خطأ في جلب الجلسات" }); }
+});
+
+// Admin: أحدث الرسائل (للمراقبة)
+app.get("/api/admin/messages", async (req, res) => {
+  try {
+    const msgs = await Message.find({}).sort({ createdAt: -1 }).limit(200).lean();
+    const ids = [...new Set(msgs.flatMap(m => [String(m.sender), String(m.receiver)].filter(Boolean)))];
+    const valid = ids.filter(x => /^[a-f\d]{24}$/i.test(x));
+    const us = valid.length ? await User.find({ _id: { $in: valid } }).select("email username1 username2").lean() : [];
+    const map = {};
+    us.forEach(u => { map[String(u._id)] = { email: u.email, name: (u.username1 || "") + " " + (u.username2 || "") }; });
+    res.json({ messages: msgs.map(m => ({
+      _id: m._id, chatId: m.chatId, text: m.text, createdAt: m.createdAt, read: m.read,
+      hasAttachments: !!(m.attachments && m.attachments.length),
+      senderInfo: map[String(m.sender)] || { email: String(m.sender), name: String(m.sender) },
+      receiverInfo: map[String(m.receiver)] || { email: String(m.receiver), name: String(m.receiver) }
+    })) });
+  } catch (e) { res.status(500).json({ error: "خطأ في جلب الرسائل" }); }
+});
+
+// Admin: حذف رسالة مخالفة
+app.delete("/api/admin/messages/:id", async (req, res) => {
+  try {
+    await Message.findByIdAndDelete(req.params.id);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: "خطأ في حذف الرسالة" }); }
+});
+
 app.use("/api/", (req, res, next) => {
   res.setHeader("X-API-Version", "v1");
   next();

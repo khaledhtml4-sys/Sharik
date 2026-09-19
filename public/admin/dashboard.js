@@ -60,8 +60,91 @@
     else if (name === 'skills') loadSkills();
     else if (name === 'exchanges') loadExchanges();
     else if (name === 'reports') loadReports();
-    else if (name === 'audit') loadAuditLogs();
+else if (name === 'audit') loadAuditLogs();
+    else if (name === 'messages') loadAdminMessages();
+    else if (name === 'sessions') loadAdminSessions();
+    else if (name === 'activity') loadAdminActivity();
   }
+
+  async function loadAdminMessages() {
+    try {
+      const data = await api('/api/admin/messages');
+      const msgs = data.messages || [];
+      safeText('messagesMeta', `${fmtNum(msgs.length)} رسالة حديثة`);
+      document.getElementById('messagesTable').innerHTML = msgs.length ? msgs.map(m => `<tr>
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">${fmtDate(m.createdAt)}</td>
+            <td><div class="user-name">${esc(m.senderInfo?.name || '—')}</div><div class="user-email">${esc(m.senderInfo?.email || '')}</div></td>
+            <td><div class="user-name">${esc(m.receiverInfo?.name || '—')}</div><div class="user-email">${esc(m.receiverInfo?.email || '')}</div></td>
+            <td class="msg-preview">${esc((m.text || '').slice(0, 90))}${((m.text || '').length > 90) ? '…' : ''}${m.hasAttachments ? ' 📎' : ''}</td>
+            <td><button class="table-action danger-action" data-action="del-msg" data-id="${esc(m._id)}">🗑 حذف</button></td>
+          </tr>`).join('') : emptyRow(5, 'لا توجد رسائل بعد');
+    } catch (e) { document.getElementById('messagesTable').innerHTML = emptyRow(5, 'خطأ: ' + (e.message || '')); }
+  }
+
+  window.deleteMessageDirect = async function (id) {
+    if (!(await SharikConfirm.show('حذف هذه الرسالة نهائياً؟', { confirmText: 'حذف' }))) return;
+    try {
+      await api(`/api/admin/messages/${id}`, { method: 'DELETE' });
+      showToast('🗑️ تم حذف الرسالة', 'success');
+      loadAdminMessages();
+    } catch (e) { showToast('فشل الحذف: ' + (e.message || ''), 'error'); }
+  };
+
+  function sessionStatusBadge(st) {
+    const L = { pending: 'قيد الانتظار', confirmed: 'مؤكدة', completed: 'مكتملة', cancelled: 'ملغاة', rescheduled: 'معاد جدولتها' };
+    const cls = { confirmed: 'confirmed', completed: 'active', cancelled: 'banned', pending: 'pending', rescheduled: 'suspended' }[st] || 'pending';
+    return statusBadge(cls).replace(/>[^<]*</, '>' + esc(L[st] || st || '—') + '<');
+  }
+
+  async function loadAdminSessions() {
+    try {
+      const data = await api('/api/admin/sessions');
+      const ss = data.sessions || [], c = data.counts || {};
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = fmtNum(v); };
+      set('sessionsTotal', c.total || 0); set('sessionsUpcoming', c.upcoming || 0);
+      set('sessionsPast', c.past || 0); set('sessionsCancelled', c.cancelled || 0);
+      document.getElementById('sessionsTable').innerHTML = ss.length ? ss.map(s => `<tr>
+            <td><div class="user-name">${esc(s.title || s.skill || 'جلسة تبادل')}</div><div class="user-email">${esc(s.skill || '')}</div></td>
+            <td><div class="user-email" style="direction:ltr">${esc(s.hostEmail || '')}</div></td>
+            <td><div class="user-email" style="direction:ltr">${esc(s.guestEmail || '')}</div></td>
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">${fmtDate(s.startAt)}</td>
+            <td>${fmtNum(s.durationMinutes || 60)} د</td>
+            <td>${sessionStatusBadge(s.status)}</td>
+          </tr>`).join('') : emptyRow(6, 'لا توجد مواعيد محجوزة بعد');
+    } catch (e) { document.getElementById('sessionsTable').innerHTML = emptyRow(6, 'خطأ: ' + (e.message || '')); }
+  }
+
+  async function loadAdminActivity() {
+    try {
+      const a = await api('/api/admin/activity');
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = fmtNum(v); };
+      set('actToday', a.today || 0); set('actWeek', a.week || 0); set('actUnique', a.uniqueToday || 0);
+      const maxCount = Math.max(1, ...(a.topPaths || []).map(x => x.count));
+      document.getElementById('topPathsList').innerHTML = (a.topPaths || []).length ? a.topPaths.map(x => `
+        <div class="bar-row"><div class="bar-label">${esc(x._id)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(x.count / maxCount * 100)}%"></div></div><div class="bar-count">${fmtNum(x.count)}</div></div>`).join('') : '<p class="muted-text">لا توجد زيارات مسجلة بعد</p>';
+      const dmax = Math.max(1, ...(a.daily || []).map(x => x.count));
+      document.getElementById('dailyBars').innerHTML = (a.daily || []).length ? a.daily.map(x => `
+        <div class="day-col" title="${esc(x._id)}: ${fmtNum(x.count)} زيارة"><div class="day-bar" style="height:${Math.max(6, Math.round(x.count / dmax * 100))}%"></div><div class="day-label">${esc((x._id || '').slice(5))}</div></div>`).join('') : '<p class="muted-text">—</p>';
+      document.getElementById('activityTable').innerHTML = (a.recent || []).length ? a.recent.map(v => `<tr>
+            <td style="color:var(--muted);font-size:12px;white-space:nowrap">${fmtDate(v.t)}</td>
+            <td><div class="user-name">${esc(v.email || 'زائر غير مسجل')}</div></td>
+            <td><span class="path-pill">${esc(v.p)}</span></td>
+            <td style="color:var(--muted);font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(v.r || '—')}</td>
+          </tr>`).join('') : emptyRow(4, 'لا توجد زيارات بعد');
+    } catch (e) {
+      ['topPathsList', 'dailyBars'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = '<p class="muted-text">خطأ: ' + (e.message || '') + '</p>'; });
+      document.getElementById('activityTable').innerHTML = emptyRow(4, 'خطأ: ' + (e.message || ''));
+    }
+  }
+
+  window.deleteUserDirect = async function (userId) {
+    if (!(await SharikConfirm.show('حذف هذا المستخدم نهائياً مع كل بياناته؟ لا يمكن التراجع.'))) return;
+    try {
+      await api(`/api/admin/users/${userId}`, { method: 'DELETE' });
+      showToast('🗑️ تم حذف المستخدم نهائياً', 'success');
+      closeModal('userModal'); loadUsers(); loadOverview();
+    } catch (e) { showToast('فشل الحذف: ' + (e.message || ''), 'error'); }
+  };
 
   async function loadOverview() {
     try {
@@ -78,6 +161,11 @@
         { icon:'🚫', value:s.bannedUsers, label:'محظورون', sub:`${fmtNum(s.suspendedUsers)} موقوف` },
         { icon:'💬', value:s.activeSessions, label:'جلسات نشطة', sub:'محادثات جارية' },
       ].map(c => `<div class="kpi-card"><div class="kpi-icon">${c.icon}</div><div class="kpi-value">${fmtNum(c.value)}</div><div class="kpi-label">${esc(c.label)}</div><div class="kpi-sub">${esc(c.sub)}</div></div>`).join('');
+        api('/api/admin/activity').then(a => {
+          if (state.section !== 'overview') return;
+          document.getElementById('kpiGrid').insertAdjacentHTML('afterbegin',
+            `<div class="kpi-card"><div class="kpi-icon">👁️</div><div class="kpi-value">${fmtNum(a.today || 0)}</div><div class="kpi-label">زيارات الصفحات اليوم</div><div class="kpi-sub">${fmtNum(a.week || 0)} هذا الأسبوع</div></div>`);
+        }).catch(() => {});
 
       const topSkills = data.topSkills || [];
       const maxD = topSkills[0]?.demand || 1;
@@ -150,7 +238,7 @@
             <td>${fmtNum((u.teachSkills||[]).length+(u.learnSkills||[]).length)}</td>
             <td style="color:var(--muted);font-size:12px">${fmtDate(u.lastLoginAt||u.updatedAt)}</td>
             <td style="color:${(u.violationCount||0)>0?'var(--danger)':'var(--muted)'};font-weight:800">${fmtNum(u.violationCount)}</td>
-            <td><div class="actions-cell"><button class="table-action" data-action="view-user" data-id="${esc(u._id)}">👁 عرض</button><button class="table-action danger-action" data-action="ban-user" data-id="${esc(u._id)}">⚡ إجراء</button></div></td>
+            <td><div class="actions-cell"><button class="table-action" data-action="view-user" data-id="${esc(u._id)}">👁 عرض</button><button class="table-action danger-action" data-action="ban-user" data-id="${esc(u._id)}">⚡ إجراء</button><button class="table-action danger-action" data-action="delete-user" data-id="${esc(u._id)}">🗑 حذف</button></div></td>
           </tr>`).join('') : emptyRow(7,'لا توجد نتائج');
       renderPagination('usersPagination', stats.totalPages||1, state.usersPage, p=>{state.usersPage=p;loadUsers();});
     } catch(e) { document.getElementById('usersTable').innerHTML=emptyRow(7,'خطأ: '+(e.message||'')); }
@@ -410,6 +498,8 @@
     else if (action==='report-status') updateReportStatus(btn.dataset.id, btn.dataset.status);
     else if (action==='report-ban') banFromReport(btn.dataset.id);
     else if (action==='report-priority') updateReportPriority(btn.dataset.id, btn.dataset.priority);
+    else if (action==='delete-user') deleteUserDirect(btn.dataset.id);
+    else if (action==='del-msg') deleteMessageDirect(btn.dataset.id);
   });
 
   function debounce(fn,delay) { let t; return (...args)=>{clearTimeout(t); t=setTimeout(()=>fn(...args),delay);}; }

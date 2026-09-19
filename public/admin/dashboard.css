@@ -785,3 +785,20 @@ tr:hover td { background: var(--surface-2); }
   .kpi-grid { grid-template-columns: 1fr 1fr; }
   .toast-container { left: 12px; right: 12px; max-width: 100%; }
 }
+
+/* ── Admin: activity / messages / sessions additions ── */
+.sessions-kpis{grid-template-columns:repeat(4,1fr)}
+.activity-kpis{grid-template-columns:repeat(3,1fr)}
+.bar-row{display:flex;align-items:center;gap:12px;padding:8px 0}
+.bar-label{min-width:170px;font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;text-align:left;color:var(--text)}
+.bar-track{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;background:linear-gradient(270deg,var(--primary,#b57bee),var(--secondary,#8b5cf6))}
+.bar-count{min-width:46px;text-align:center;font-weight:800;font-size:13px;color:var(--primary,#b57bee)}
+.daily-bars{display:flex;align-items:flex-end;gap:8px;height:150px;padding:10px 4px 0}
+.day-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;height:100%}
+.day-bar{width:100%;max-width:40px;border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,#b57bee,#8b5cf6)}
+.day-label{font-size:10px;color:var(--muted,#94a3b8)}
+.path-pill{display:inline-block;padding:3px 10px;border-radius:20px;background:rgba(181,123,238,.12);color:#d3a4ef;font-size:12px;direction:ltr;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.msg-preview{max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.light .bar-track{background:rgba(15,23,42,.08)}
+@media (max-width:900px){.sessions-kpis,.activity-kpis{grid-template-columns:repeat(2,1fr)}}

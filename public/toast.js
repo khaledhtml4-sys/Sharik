@@ -267,9 +267,25 @@
 
   window.SharikConfirm = { show: showConfirm };
 
-  function boot() { ensureStack(); }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
+  function boot() {
+    ensureStack();
+    /* تتبع الزيارات — بيج: مسار الصفحة + المستخدم إن كان مسجلاً */
+    try {
+      var base = (window.SHARIK_CONFIG && window.SHARIK_CONFIG.API_BASE) || "";
+      var tk = null;
+      try { tk = localStorage.getItem("token"); } catch (e) {}
+      var headers = { "Content-Type": "application/json" };
+      if (tk) headers.Authorization = "Bearer " + tk;
+      fetch(base + "/api/track", {
+        method: "POST",
+        keepalive: true,
+        headers: headers,
+        body: JSON.stringify({ p: location.pathname, r: document.referrer || "" })
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
   } else {
     boot();
   }
