@@ -1,0 +1,10 @@
+node_modules
+.env
+*.log
+npm-debug.log*
+.git
+.github
+.qa-work
+i18n-work
+.DS_Store
+Thumbs.db
