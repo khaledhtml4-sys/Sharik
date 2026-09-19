@@ -849,6 +849,7 @@ app.post("/api/register", async (req, res) => {
       email: email.toLowerCase().trim(),
       password: password,
       role: role,
+      lastLoginAt: new Date(),
     });
     await user.save();
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
@@ -2424,7 +2425,22 @@ app.get("/api/admin/users/:userId", requireAdmin("users:read"), async (req, res)
   const audit = await AuditLog.find({ targetId: String(user._id) }).sort({ createdAt: -1 }).limit(20).lean();
   const reports = await Report.find({ reportedEmail: user.email }).sort({ createdAt: -1 }).limit(10).lean();
   const lastLogin = (user.loginHistory || []).slice(-1)[0] || null;
+  const uidStr = String(user._id);
+  const p12 = new Date(Date.now() - 12 * 3600 * 1000);
+  let activity = { visits12h: 0, visitsTotal: 0, lastPaths: [] };
+  try {
+    const pv = mongoose.models.Pageview ? mongoose.model("Pageview") : null;
+    if (pv) {
+      const [v12, vt, lp] = await Promise.all([
+        pv.countDocuments({ u: uidStr, t: { $gte: p12 } }),
+        pv.countDocuments({ u: uidStr }),
+        pv.find({ u: uidStr }).sort({ t: -1 }).limit(5).select("p t").lean()
+      ]);
+      activity = { visits12h: v12, visitsTotal: vt, lastPaths: lp };
+    }
+  } catch (_) {}
   res.json({
+    activity,
     user: {
       ...user,
       lastIp: lastLogin?.ip || "",
@@ -2722,7 +2738,7 @@ app.get("/api/admin/settings", requireAdmin("settings:write"), async (req, res) 
 app.get("/api/admin/users", authMiddleware, async (req, res) => {
   try {
     const admin = await User.findById(req.userId);
-    if (!admin || admin.role !== "admin") {
+    if (!admin || !ADMIN_ROLES.includes(admin.role)) {
       return res.status(403).json({ error: "غير مصرح لك — يجب أن تكون مسؤولاً" });
     }
 
@@ -2772,7 +2788,7 @@ app.get("/api/admin/users", authMiddleware, async (req, res) => {
 app.put("/api/admin/users/:userId/status", authMiddleware, async (req, res) => {
   try {
     const admin = await User.findById(req.userId);
-    if (!admin || admin.role !== "admin") {
+    if (!admin || !ADMIN_ROLES.includes(admin.role)) {
       return res.status(403).json({ error: "غير مصرح لك" });
     }
     const { status } = req.body;
@@ -2791,7 +2807,7 @@ app.put("/api/admin/users/:userId/status", authMiddleware, async (req, res) => {
 app.get("/api/admin/chats", authMiddleware, async (req, res) => {
   try {
     const admin = await User.findById(req.userId);
-    if (!admin || admin.role !== "admin") {
+    if (!admin || !ADMIN_ROLES.includes(admin.role)) {
       return res.status(403).json({ error: "غير مصرح لك" });
     }
     // Group messages by chatId to find unique sessions
@@ -2800,7 +2816,11 @@ app.get("/api/admin/chats", authMiddleware, async (req, res) => {
       { $sort: { lastMessage: -1 } },
       { $limit: 50 }
     ]);
-    res.json({ chats: chatStats });
+    const chats = chatStats.map((c) => {
+      const parts = String(c._id || "").split("_").filter((p) => p.includes("@"));
+      return { chatId: c._id, msgCount: c.msgCount, lastMessage: c.lastMessage, emailA: parts[0] || "", emailB: parts[1] || "" };
+    });
+    res.json({ chats });
   } catch (err) {
     res.status(500).json({ error: "Error fetching admin chats" });
   }
@@ -2810,7 +2830,7 @@ app.get("/api/admin/chats", authMiddleware, async (req, res) => {
 app.get("/api/admin/blogs", authMiddleware, async (req, res) => {
   try {
     const admin = await User.findById(req.userId);
-    if (!admin || admin.role !== "admin") {
+    if (!admin || !ADMIN_ROLES.includes(admin.role)) {
       return res.status(403).json({ error: "غير مصرح لك" });
     }
     const blogs = await Article.find().sort({ createdAt: -1 }).limit(50).lean();
@@ -2824,7 +2844,7 @@ app.get("/api/admin/blogs", authMiddleware, async (req, res) => {
 app.get("/api/admin/reports", authMiddleware, async (req, res) => {
   try {
     const admin = await User.findById(req.userId);
-    if (!admin || admin.role !== "admin") {
+    if (!admin || !ADMIN_ROLES.includes(admin.role)) {
       return res.status(403).json({ error: "غير مصرح لك" });
     }
     const reports = await Report.find().sort({ createdAt: -1 }).limit(100).lean();
@@ -5180,10 +5200,11 @@ app.get("/api/admin/messages", async (req, res) => {
   try {
     const msgs = await Message.find({}).sort({ createdAt: -1 }).limit(200).lean();
     const ids = [...new Set(msgs.flatMap(m => [String(m.sender), String(m.receiver)].filter(Boolean)))];
-    const valid = ids.filter(x => /^[a-f\d]{24}$/i.test(x));
-    const us = valid.length ? await User.find({ _id: { $in: valid } }).select("email username1 username2").lean() : [];
+    const emails = ids.filter(x => x.includes("@"));
+    const validIds = ids.filter(x => /^[a-f\d]{24}$/i.test(x));
+    const us = await User.find({ $or: emails.length ? [{ email: { $in: emails } }] : [], _id: validIds.length ? { $in: validIds } : undefined }).select("email username1 username2").lean();
     const map = {};
-    us.forEach(u => { map[String(u._id)] = { email: u.email, name: (u.username1 || "") + " " + (u.username2 || "") }; });
+    us.forEach(u => { map[u.email] = { email: u.email, name: (u.username1 || "") + " " + (u.username2 || "") }; map[String(u._id)] = map[u.email]; });
     res.json({ messages: msgs.map(m => ({
       _id: m._id, chatId: m.chatId, text: m.text, createdAt: m.createdAt, read: m.read,
       hasAttachments: !!(m.attachments && m.attachments.length),
@@ -5199,6 +5220,54 @@ app.delete("/api/admin/messages/:id", async (req, res) => {
     await Message.findByIdAndDelete(req.params.id);
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: "خطأ في حذف الرسالة" }); }
+});
+
+
+// Admin: المحادثة الكاملة بين اتنين (كل الرسائل بالترتيب)
+app.get("/api/admin/chats/:chatId/messages", async (req, res) => {
+  try {
+    const chatId = decodeURIComponent(req.params.chatId);
+    const msgs = await Message.find({ chatId }).sort({ createdAt: 1 }).limit(400).lean();
+    const ids = [...new Set(msgs.flatMap((m) => [String(m.sender), String(m.receiver)].filter(Boolean)))];
+    const emails = ids.filter((x) => x.includes("@"));
+    const validIds = ids.filter((x) => /^[a-f\d]{24}$/i.test(x));
+    const us = await User.find({ $or: emails.length ? [{ email: { $in: emails } }] : [], _id: validIds.length ? { $in: validIds } : undefined }).select("email username1 username2").lean();
+    const map = {};
+    us.forEach((u) => { map[u.email] = { email: u.email, name: (u.username1 || "") + " " + (u.username2 || "") }; map[String(u._id)] = map[u.email]; });
+    res.json({
+      chatId,
+      participants: [msgs.length ? (map[String(msgs[0].sender)] || { email: String(msgs[0].sender), name: String(msgs[0].sender) }) : { email: "", name: "" }, msgs.length ? (map[String(msgs[0].receiver)] || { email: String(msgs[0].receiver), name: String(msgs[0].receiver) }) : { email: "", name: "" }],
+      messages: msgs.map((m) => ({
+        _id: m._id, text: m.text, createdAt: m.createdAt, sender: String(m.sender),
+        senderInfo: map[String(m.sender)] || { email: String(m.sender), name: String(m.sender) },
+        hasAttachments: !!(m.attachments && m.attachments.length)
+      }))
+    });
+  } catch (e) { res.status(500).json({ error: "خطأ في جلب المحادثة" }); }
+});
+
+// Admin: حذف شكوى (خاصة التجريبية/المكررة)
+app.delete("/api/admin/reports/:id", async (req, res) => {
+  try {
+    await Report.findByIdAndDelete(req.params.id);
+    await writeAuditLog(req, "report.delete", { type: "report", id: req.params.id }, {});
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: "خطأ في حذف الشكوى" }); }
+});
+
+// Admin: آخر الإشعارات المرسلة فعلياً (من ملفات المستخدمين)
+app.get("/api/admin/notifications", async (req, res) => {
+  try {
+    const rows = await User.aggregate([
+      { $match: { notifications: { $exists: true, $ne: [] } } },
+      { $project: { email: 1, notifications: 1 } },
+      { $unwind: "$notifications" },
+      { $sort: { "notifications.date": -1 } },
+      { $limit: 60 },
+      { $project: { email: 1, title: "$notifications.title", message: "$notifications.message", type: "$notifications.type", date: "$notifications.date", read: "$notifications.read" } }
+    ]);
+    res.json({ notifications: rows });
+  } catch (e) { res.status(500).json({ error: "خطأ في جلب الإشعارات" }); }
 });
 
 app.use("/api/", (req, res, next) => {

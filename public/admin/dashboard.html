@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" />
   <script src="/config.js?v=20260726"></script>
   <script src="/i18n.js" defer></script><script src="/toast.js" defer></script>
-  <link rel="stylesheet" href="dashboard.css?v=20260726" />
+  <link rel="stylesheet" href="dashboard.css?v=20260919c" />
 <link rel="stylesheet" href="/tria-theme.css">
 </head>
 <body>
@@ -153,7 +153,8 @@
     </section>
 
     <!-- NOTIFICATIONS -->
-    <section class="section" id="section-notifications" data-title="إرسال إشعارات">
+    <section class="section" id="section-notifications" data-title="الإشعارات">
+      <div class="card"><div class="card-head"><h2>🔔 آخر الإشعارات المرسلة للمستخدمين (حقيقية)</h2><button class="table-action" data-action="load-notifs">🔄 تحديث</button></div><div id="recentNotifsList" class="rank-list"><p class="muted-text">اضغط تحديث للعرض</p></div></div>
       <div class="grid-2-narrow">
         <div class="card">
           <div class="card-head"><h2>📣 إرسال إشعار</h2></div>
@@ -192,11 +193,17 @@
 
 
     <section class="section" id="section-messages" data-title="الرسائل">
-      <div class="toolbar"><span class="meta-label" id="messagesMeta">—</span><span class="meta-label">أحدث 200 رسالة — للمراقبة والتنظيم</span></div>
-      <div class="card table-card"><div class="table-scroll"><table>
-        <thead><tr><th>الوقت</th><th>المرسل</th><th>المستقبل</th><th>الرسالة</th><th>إجراء</th></tr></thead>
-        <tbody id="messagesTable"><tr><td colspan="5" class="loading-cell">جاري التحميل...</td></tr></tbody>
-      </table></div></div>
+      <div class="messages-layout">
+        <div class="card conversations-card">
+          <div class="card-head"><h2>💬 المحادثات</h2></div>
+          <div class="toolbar" style="padding:0 12px"><input type="text" class="input search-input" id="chatSearch" placeholder="🔍 ابحث بالبريد..." /></div>
+          <div id="chatsList" class="chats-list"><p class="muted-text">جاري التحميل...</p></div>
+        </div>
+        <div class="card thread-card">
+          <div class="card-head"><h2 id="threadTitle">اختر محادثة لعرضها</h2></div>
+          <div id="threadView" class="thread-view"><p class="muted-text" style="padding:16px;text-align:center">اختر محادثة من القائمة لعرض الرسائل كاملة</p></div>
+        </div>
+      </div>
     </section>
 
     <section class="section" id="section-sessions" data-title="المواعيد والجلسات">
@@ -256,6 +263,6 @@
 </div>
 
 <div id="toastContainer" class="toast-container"></div>
-<script src="dashboard.js?v=20260919"></script>
+<script src="dashboard.js?v=20260919b"></script>
 </body>
 </html>

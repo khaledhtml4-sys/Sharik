@@ -64,22 +64,72 @@ else if (name === 'audit') loadAuditLogs();
     else if (name === 'messages') loadAdminMessages();
     else if (name === 'sessions') loadAdminSessions();
     else if (name === 'activity') loadAdminActivity();
+    else if (name === 'notifications') loadRecentNotifications();
   }
 
+  let stateChats = [];
   async function loadAdminMessages() {
     try {
-      const data = await api('/api/admin/messages');
-      const msgs = data.messages || [];
-      safeText('messagesMeta', `${fmtNum(msgs.length)} رسالة حديثة`);
-      document.getElementById('messagesTable').innerHTML = msgs.length ? msgs.map(m => `<tr>
-            <td style="color:var(--muted);font-size:12px;white-space:nowrap">${fmtDate(m.createdAt)}</td>
-            <td><div class="user-name">${esc(m.senderInfo?.name || '—')}</div><div class="user-email">${esc(m.senderInfo?.email || '')}</div></td>
-            <td><div class="user-name">${esc(m.receiverInfo?.name || '—')}</div><div class="user-email">${esc(m.receiverInfo?.email || '')}</div></td>
-            <td class="msg-preview">${esc((m.text || '').slice(0, 90))}${((m.text || '').length > 90) ? '…' : ''}${m.hasAttachments ? ' 📎' : ''}</td>
-            <td><button class="table-action danger-action" data-action="del-msg" data-id="${esc(m._id)}">🗑 حذف</button></td>
-          </tr>`).join('') : emptyRow(5, 'لا توجد رسائل بعد');
-    } catch (e) { document.getElementById('messagesTable').innerHTML = emptyRow(5, 'خطأ: ' + (e.message || '')); }
+      const data = await api('/api/admin/chats');
+      stateChats = (data.chats || []).slice(0, 100);
+      renderChatsList('');
+    } catch (e) { document.getElementById('chatsList').innerHTML = '<p class="muted-text">خطأ: ' + (e.message || '') + '</p>'; }
   }
+
+  function renderChatsList(filter) {
+    const list = stateChats.filter(c => !filter || (c.emailA + ' ' + c.emailB).toLowerCase().includes(filter));
+    const el = document.getElementById('chatsList');
+    if (!el) return;
+    el.innerHTML = list.length ? list.map(c => `
+      <div class="chat-row" data-chatid="${esc(c.chatId)}" onclick="openChatThread(this.dataset.chatid)">
+        <div class="chat-avatars"><span class="chat-ava">${esc((c.emailA || '?')[0].toUpperCase())}</span><span class="chat-ava alt">${esc((c.emailB || '?')[0].toUpperCase())}</span></div>
+        <div class="chat-info"><div class="chat-emails" style="direction:ltr">${esc(c.emailA || '؟')}</div><div class="chat-emails muted" style="direction:ltr">${esc(c.emailB || '؟')}</div></div>
+        <div class="chat-meta"><span class="chat-count">${fmtNum(c.msgCount)}</span><span class="chat-time">${fmtDate(c.lastMessage)}</span></div>
+      </div>`).join('') : '<p class="muted-text" style="padding:12px">لا توجد محادثات بعد</p>';
+  }
+
+  window.openChatThread = async function (chatId) {
+    document.querySelectorAll('.chat-row').forEach(r => r.classList.toggle('active', r.dataset.chatid === chatId));
+    const tv = document.getElementById('threadView');
+    const tt = document.getElementById('threadTitle');
+    if (tt) tt.textContent = 'جاري التحميل...';
+    try {
+      const data = await api('/api/admin/chats/' + encodeURIComponent(chatId) + '/messages');
+      const msgs = data.messages || [];
+      const p = data.participants || [];
+      if (tt) tt.textContent = '💬 ' + (p[0]?.email || '؟') + ' ↔ ' + (p[1]?.email || '؟') + ' (' + fmtNum(msgs.length) + ' رسالة)';
+      if (!tv) return;
+      tv.innerHTML = msgs.length ? msgs.map(m => `
+        <div class="msg-bubble ${esc(m.senderInfo?.email || '') === String(p[0]?.email || '') ? 'them' : 'me'}" data-mid="${esc(m._id)}">
+          <div class="msg-meta">${esc(m.senderInfo?.name || m.senderInfo?.email || '')} · ${fmtDate(m.createdAt)}${m.hasAttachments ? ' 📎' : ''}</div>
+          <div class="msg-text">${esc(m.text || '')}</div>
+          <button class="msg-del" data-action="del-msg" data-id="${esc(m._id)}" title="حذف الرسالة">🗑</button>
+        </div>`).join('') : '<p class="muted-text" style="padding:16px;text-align:center">محادثة فارغة</p>';
+      tv.scrollTop = tv.scrollHeight;
+    } catch (e) { if (tv) tv.innerHTML = '<p class="muted-text" style="padding:16px">خطأ: ' + (e.message || '') + '</p>'; }
+  };
+
+  async function loadRecentNotifications() {
+    try {
+      const data = await api('/api/admin/notifications');
+      const rows = data.notifications || [];
+      const el = document.getElementById('recentNotifsList');
+      if (!el) return;
+      el.innerHTML = rows.length ? rows.map(n => `
+        <div class="notif-row"><div><strong>${esc(n.title || '—')}</strong><div class="muted-text" style="font-size:12px">${esc(n.message || '')}</div></div>
+        <div class="notif-meta"><span class="user-email" style="direction:ltr">${esc(n.email || '')}</span><span class="muted-text" style="font-size:11px">${fmtDate(n.date)}</span></div></div>`).join('')
+        : '<p class="muted-text" style="padding:8px">لا توجد إشعارات مرسلة بعد</p>';
+    } catch (e) { const el = document.getElementById('recentNotifsList'); if (el) el.innerHTML = '<p class="muted-text">خطأ: ' + (e.message || '') + '</p>'; }
+  }
+
+  window.deleteReportDirect = async function (id) {
+    if (!(await SharikConfirm.show('حذف هذه الشكوى نهائياً؟', { confirmText: 'حذف' }))) return;
+    try {
+      await api(`/api/admin/reports/${id}`, { method: 'DELETE' });
+      showToast('🗑️ تم حذف الشكوى', 'success');
+      loadReports();
+    } catch (e) { showToast('فشل الحذف: ' + (e.message || ''), 'error'); }
+  };
 
   window.deleteMessageDirect = async function (id) {
     if (!(await SharikConfirm.show('حذف هذه الرسالة نهائياً؟', { confirmText: 'حذف' }))) return;
@@ -320,6 +370,7 @@ else if (name === 'audit') loadAuditLogs();
               <button class="table-action" data-action="report-status" data-id="${esc(r._id)}" data-status="reviewing">🔍 مراجعة</button>
               <button class="table-action success-action" data-action="report-status" data-id="${esc(r._id)}" data-status="resolved">✅ حل</button>
               <button class="table-action danger-action" data-action="report-ban" data-id="${esc(r._id)}">⚡ حظر</button>
+              <button class="table-action danger-action" data-action="del-report" data-id="${esc(r._id)}">🗑 حذف</button>
             </div></td>
           </tr>`).join('') : emptyRow(8,'لا توجد شكاوى');
       renderPagination('reportsPagination', stats.totalPages||1, state.reportsPage, p=>{state.reportsPage=p;loadReports();});
@@ -366,7 +417,7 @@ else if (name === 'audit') loadAuditLogs();
     document.getElementById('userModalBody').innerHTML = '<p style="text-align:center;padding:24px;color:var(--muted)">جاري التحميل...</p>';
     try {
       const data = await api(`/api/admin/users/${userId}`);
-      const u = data.user || {}; const audit = data.audit || []; const reports = data.reports || [];
+      const u = data.user || {}; const audit = data.audit || []; const reports = data.reports || []; const activity = data.activity || {};
       safeText('userModalTitle', `ملف: ${userName(u)}`);
       function pCard(label, value, color) { return `<div class="profile-card"><span>${esc(label)}</span><strong style="${color?`color:${color}`:''}"><span>${esc(String(value||'—'))}</span></strong></div>`; }
 
@@ -395,7 +446,10 @@ else if (name === 'audit') loadAuditLogs();
           ${pCard('سبب الحظر', u.banReason||'لا يوجد')}
           ${pCard('تاريخ التسجيل', fmtDate(u.createdAt))}
           ${pCard('آخر دخول', fmtDate(u.lastLoginAt))}
+          ${pCard('زيارات آخر ١٢ ساعة', (activity.visits12h || 0) + ' زيارة', (activity.visits12h || 0) > 0 ? 'var(--success,#10b981)' : '')}
+          ${pCard('إجمالي زياراته', (activity.visitsTotal || 0) + ' زيارة')}
         </div>
+        ${(activity.lastPaths || []).length ? `<div style="margin-top:12px"><h3 style="font-size:14px;margin-bottom:6px">📄 آخر الصفحات التي فتحها</h3>${activity.lastPaths.map(pv => `<div class="profile-card"><span class="path-pill">${esc(pv.p)}</span><strong style="color:var(--muted);font-weight:600;font-size:12px">${fmtDate(pv.t)}</strong></div>`).join('')}</div>` : ''}
         ${loginHistoryHtml}
         ${reportsOnUserHtml}
         <h3 style="margin:16px 0 8px;font-size:15px">📋 سجل الإجراءات (${audit.length})</h3>
@@ -500,6 +554,8 @@ else if (name === 'audit') loadAuditLogs();
     else if (action==='report-priority') updateReportPriority(btn.dataset.id, btn.dataset.priority);
     else if (action==='delete-user') deleteUserDirect(btn.dataset.id);
     else if (action==='del-msg') deleteMessageDirect(btn.dataset.id);
+    else if (action==='del-report') deleteReportDirect(btn.dataset.id);
+    else if (action==='load-notifs') loadRecentNotifications();
   });
 
   function debounce(fn,delay) { let t; return (...args)=>{clearTimeout(t); t=setTimeout(()=>fn(...args),delay);}; }
